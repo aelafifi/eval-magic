@@ -1,0 +1,26 @@
+{
+  "name": "eval-magic",
+  "version": "0.0.1-alpha.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:node": "esbuild ./src/index.ts --bundle --outfile=index.js --packages=external --platform=node",
+    "build:browser": "esbuild ./src/index.ts --bundle --outfile=index.js --platform=browser --global-name=executejs --minify",
+    "build:all": "npm run build && npm run build:browser"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/acorn": "^6.0.0",
+    "@types/escodegen": "^0.0.10",
+    "esbuild": "0.25.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "acorn": "^8.12.1",
+    "escodegen": "^2.1.0"
+  }
+}
