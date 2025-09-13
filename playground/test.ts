@@ -1,4 +1,4 @@
-import { compile, execute, Py } from "./src";
+import { compile, execute, Py } from "../src";
 
 export type PointLike = [number, number];
 

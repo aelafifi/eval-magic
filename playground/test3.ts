@@ -1,4 +1,4 @@
-import { compile, execute } from "./src";
+import { compile, execute } from "../src";
 import * as acorn from "acorn";
 
 const code = `
