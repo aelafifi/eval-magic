@@ -1,28 +1,88 @@
-Everything started when I wanted to create a paper.js jupyter-like notebook.
-I had to use their paper script, which has some bugs and also some lag of features!
-Also, I wanted to add some custom features to my project.
+# Eval-Magic
 
-I decided to create my custom "eval-like" function.
-and while my main stacks are Node.js and Python,
-I decided to add the python magic methods support to JS.
+A Node.js package that lets you evaluate JavaScript code in a defined scope while still allowing access to the global scope (⚠️ security here is the user’s responsibility).
 
-I know that when we write JS code we usually use the IDE, not writing it as a string and then calling `eval` over that string!
-but this is not intended to replace JS, but just to provide functionality to projects similar to paper script.
+## ✨ Features
+- Scoped evaluation: Run JS code with custom-defined scope objects.
+- Python-like magic methods: Bring operator overloading and more expressive patterns into JavaScript.
+- Use export instead of return: Write modular code snippets that feel natural.
+- Custom imports: Define your own import function (sync or async) to handle user imports however you like.
 
+## 💡 Why?
 
+Execute.js was built to make JavaScript more expressive and flexible, especially for developers experimenting with:
+- Domain-Specific Languages (DSLs)
+- Creative coding
+- Operator overloading
+- Sandbox-like script evaluation with custom rules
 
-> ## Introduction
-> 
-> `ExecuteJS` was born out of a need for flexibility and customization while building a Jupyter-like notebook experience for paper.js. PaperScript—the scripting layer provided by [paper.js](http://paperjs.org/)—has its limitations: subtle bugs, missing features, and a lack of extensibility for more advanced use cases.
-> 
-> To overcome those issues, I set out to build a custom `eval`-like execution layer for JavaScript—one that’s not meant to replace standard JS development, but to enable dynamic scripting in creative, interactive environments like PaperScript.
-> 
-> Given my background in both Node.js and Python, I wanted to bring the expressiveness of Python—especially its “magic methods”—into the JavaScript world. The result is `ExecuteJS`: a lightweight runtime that adds syntactic and functional enhancements to JS when it’s written and executed as a string, making it ideal for environments where embedding code is part of the workflow.
+## 📦 Installation
 
-## Example
+```shell
+npm install eval-magic
+```
+
+## ⚙️ How it works?
+
+Eval-Magic evaluates code in a multi-step process to enable magic methods, custom imports, and flow-friendly exports:
+
+- **AST Parsing & Transformation:** The input JavaScript code is parsed into an Abstract Syntax Tree (AST). This allows Eval-Magic to analyze and transform the code before execution.
+- **Operator Overloading:** Operator expressions (like `+`, `-`, `*`, etc.) are rewritten to call special methods on objects, enabling Python-like operator overloading in JavaScript.
+- **Custom Imports:** Import statements can be handled by a user-defined function, allowing for custom module resolution or mocking.
+- **Export Interception:** Instead of using `return`, you can use `export` in your code snippets. Eval-Magic intercepts these exports so that code flow isn't interrupted, making it easier to write modular snippets.
+- **Scoped Execution:** The transformed code is generated back to JavaScript and executed in a provided scope object. This scope is merged with the global scope when needed, so you can access globals while maintaining isolation.
+
+This approach enables expressive, Python-inspired features in JavaScript without breaking the normal flow or requiring language-level changes.
+
+## 🛠️ Usage
+
+### 1. Export
 
 ```javascript
-import {Py} from "src";
+import { evaluate } from "eval-magic";
+
+const result = evaluate(
+    `
+    export const sum = x + y;
+    export const diff = x - y;
+    `,
+    { x: 10, y: 20 },
+);
+
+console.log(result);
+// Output: { sum: 30, diff: -10 }
+```
+
+### 2. Import
+
+```javascript
+import { evaluate } from "eval-magic";
+
+const result = await evaluate(
+    `
+    import { sqrt } from "mathjs";
+    export const root = sqrt(x);
+    `,
+    { x: 16 },
+    {
+        importFunction: async (moduleName) => {
+            try {
+                // Some code to resolve moduleName to an actual module (as an object)
+            } catch (e) {
+                throw new Error("Module not found: " + moduleName);
+            }
+        },
+    },
+);
+
+console.log(result);
+// Output: { root: 4 }
+```
+
+## 🚀 Example
+
+```javascript
+import {Py} from "eval-magic";
 
 class Point {
     constructor(x, y) {
@@ -249,3 +309,32 @@ class Point {
     }
 }
 ```
+
+## API Reference
+
+### interface RunOptions
+Configuration options for parsing, transforming, and executing code.
+
+- `parseOptions?: Partial<acorn.Options>`
+  > Options for the Acorn parser. Defaults to { \
+  >   `"ecmaVersion": "latest",` \
+  >   `"sourceType": "module", // if options.returns == "exports"` \
+  >   `"allowReturnOutsideFunction": true, // if options.returns == "return"` \
+  > }
+
+- `codegenOptions?: escodegen.GenerateOptions`
+  > Options passed to Escodegen for code generation.
+- `returns?: "exports" | "return"`
+  > Defines return handling:
+  > - "exports": Values can be exported anywhere in code (default).
+  > - "return": Standard JavaScript return behavior.
+- `operatorOverloading?: boolean`
+  > Enables Python-like operator overloading via magic methods (default: true).
+- `customVisitors?: Record<string, VisitorFn>`
+  > Custom AST visitors for additional transformations.
+- `importFunction?: (source: string) => Object | Promise<Object>`
+  > Custom import handler for sync/async in-code imports.
+- `isAsync?: boolean`
+  > Wraps code in an async function, allowing top-level await (default: false). \
+  > Note: If options.importFunction is defined as async, this will be set to true automatically.
+

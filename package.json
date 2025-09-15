@@ -1,6 +1,6 @@
 {
   "name": "eval-magic",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build:all": "npm run build && npm run build:browser"
   },
   "keywords": [],
-  "author": "",
+  "author": "ahmed.s.elafifi@gmail.com",
   "license": "ISC",
   "devDependencies": {
     "@types/acorn": "^6.0.0",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "acorn": "^8.12.1",
-    "escodegen": "^2.1.0"
+    "escodegen": "^2.1.0",
+    "estree-walk-plus": "^0.0.2"
   }
 }

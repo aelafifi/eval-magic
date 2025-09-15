@@ -35,6 +35,8 @@ export const Py = {
   __le__: Symbol.for("__le__"),
   __gt__: Symbol.for("__gt__"),
   __ge__: Symbol.for("__ge__"),
+  __seq__: Symbol.for("__seq__"), // Strict equality (===)
+  __sne__: Symbol.for("__sne__"), // Strict inequality (!==)
   __cmp__: Symbol.for("__cmp__"), // Custom comparison shorthand
 
   // 2.4. Logical Operators
@@ -100,6 +102,8 @@ const binaryDefaultActions: Record<symbol, (a: any, b: any) => any> = {
   [Py.__le__]: (a: any, b: any) => a <= b,
   [Py.__gt__]: (a: any, b: any) => a > b,
   [Py.__ge__]: (a: any, b: any) => a >= b,
+  [Py.__seq__]: (a: any, b: any) => a === b, // Strict equality (===)
+  [Py.__sne__]: (a: any, b: any) => a !== b, // Strict inequality (!==)
   [Py.__in__]: (a: any, b: any) => a in b,
   [Py.__instanceof__]: (a: any, b: any) => a instanceof b,
   [Py.__bitwise_and__]: (a: any, b: any) => a & b,
@@ -152,6 +156,8 @@ const opposites = {
   [Py.__le__]: Py.__ge__,
   [Py.__gt__]: Py.__lt__,
   [Py.__ge__]: Py.__le__,
+  [Py.__seq__]: Py.__seq__,
+  [Py.__sne__]: Py.__sne__,
   [Py.__in__]: Py.__rin__,
   [Py.__instanceof__]: Py.__rinstanceof__,
   [Py.__bitwise_and__]: Py.__rbitwise_and__,
@@ -185,6 +191,8 @@ export const binaryOperatorsMap: Record<string, symbol> = {
   "^": Py.__xor__,
   "==": Py.__eq__,
   "!=": Py.__ne__,
+  "===": Py.__seq__,
+  "!==": Py.__sne__,
   "<": Py.__lt__,
   "<=": Py.__le__,
   ">": Py.__gt__,
