@@ -53,7 +53,7 @@ Configuration options for parsing, transforming, and executing the code.
   ```typescript
   {
     ecmaVersion: "latest",
-    sourceType: "module", // when options.returns === "exports"
+    sourceType: "module", // when options.returns === "exports", or if import function is defined
     allowReturnOutsideFunction: true // when options.returns === "return"
   }
   ```
@@ -74,23 +74,23 @@ Configuration options for parsing, transforming, and executing the code.
   
   **Default:** `true`
 
-- **`customVisitors?: Record<string, VisitorFn>`**
-  
-  Custom AST visitor functions for additional transformations during the compilation process.
-  
-  **Note:** This property is not currently defined in the TypeScript interface but is used in the implementation.
+
 
 - **`importFunction?: (source: string) => Object | Promise<Object>`**
   
   Custom import handler for resolving module imports. Can be synchronous or asynchronous.
-  
-  **Note:** If an async function is provided, `options.isAsync` will automatically be set to `true`.
 
 - **`isAsync?: boolean`**
   
   Wraps the generated code in an async function, enabling top-level await usage.
   
   **Default:** `false`
+  
+  **Note:** Even with explicit `isAsync: false`, the function returned by compile will still return a promise (will be async) if:
+  - Any `await` keyword appears in the code
+  - Your code has import statements, and the passed importFunction is async
+  
+  **TODO:** Check for await keywords - they should affect the async behavior only if they are used on the root level, because if they are used internally in an async function defined in the code, they shouldn't change the compile function behavior.
 
 ### Return Value
 
@@ -183,11 +183,12 @@ class Point {
 }
 
 const compiled = compile(
-  `export const result = p1 + p2;`,
-  {
-    p1: new Point(1, 2),
-    p2: new Point(3, 4)
-  }
+  `
+  const p1 = new Point(1, 2);
+  const p2 = new Point(3, 4);
+  export const result = p1 + p2;
+  `,
+  { Point }
 );
 
 const result = compiled.run();
@@ -206,10 +207,10 @@ const compiled = compile(
   export const result = "Async operation completed";
   `,
   { setTimeout: global.setTimeout },
-  { isAsync: true }
+  { isAsync: false } // This will be ignored because the code has await keyword
 );
 
-// Note: run() returns a Promise when isAsync is true
+// Note: run() returns a Promise when the code contains await or isAsync is true
 const result = await compiled.run();
 console.log(result); // { result: "Async operation completed" }
 ```
@@ -272,6 +273,12 @@ const result3 = compiled.run(); // Can reuse the compiled function
 // Both approaches yield the same result
 console.log(result1); // { sum: 3 }
 console.log(result2); // { sum: 3 }
+console.log(result3); // { sum: 3 }
+
+// Assert that all results are equal
+console.assert(JSON.stringify(result1) === JSON.stringify(result2));
+console.assert(JSON.stringify(result2) === JSON.stringify(result3));
+console.assert(JSON.stringify(result1) === JSON.stringify(result3));
 ```
 
 ## Error Handling
@@ -296,8 +303,6 @@ try {
 ```javascript
 import { compile } from "eval-magic";
 
-// Currently, there's a bug in import function validation
-// This will throw an error even with a valid importFunction
 try {
   const compiled = compile(
     `import { unknown } from "missing-module";`,
@@ -312,7 +317,7 @@ try {
   compiled.run();
 } catch (error) {
   console.error("Import error:", error.message);
-  // Will show: "import statement is not allowed without an importFunction"
+  // Will show: "Module not found: missing-module"
 }
 ```
 
@@ -365,3 +370,7 @@ For different inputs, you would typically use parameter passing or recompile wit
 
 - **[`evaluate`](README.md#usage)**: Higher-level function that compiles and immediately executes code
 - **[`Py` operators](README.md#example)**: Magic method symbols for operator overloading
+
+## TODOs
+
+- [ ] Allow compiled functions to be called with different `globals` several times without the need to re-compile
