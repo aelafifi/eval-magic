@@ -15,6 +15,7 @@ export interface RunOptions {
   // ExecuteJS options
   returns?: "exports" | "return";
   operatorOverloading?: boolean;
+  customVisitors?: Record<string, any>;
   importFunction?: (source: string) => Object;
   isAsync?: boolean;
 }

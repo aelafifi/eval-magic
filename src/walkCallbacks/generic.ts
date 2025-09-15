@@ -15,7 +15,7 @@ export const Program: DirectionalWalkCallback = (
     ReturnStatement({
       type: "ObjectExpression",
       properties: state.exports.map(
-        ({ declaration: value, exported: key, spread }) =>
+        ({ declaration: value, exported: key, spread }: any) =>
           spread
             ? {
                 type: "SpreadElement",

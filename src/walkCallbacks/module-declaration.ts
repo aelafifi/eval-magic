@@ -12,11 +12,12 @@ function importFnCall(
   src: acorn.Literal,
   state: any,
 ): acorn.AwaitExpression | acorn.CallExpression {
-  if (state.options.importFunction !== "function")
+  if (typeof state.options.importFunction !== "function")
     throw new Error(
       "import statement is not allowed without an importFunction",
     );
 
+  state.importFnUsed = true;
   const fnCall = CallExpression(Identifier(state.importFnName), [src]);
   return state.options.importFunction instanceof AsyncFunction
     ? AwaitExpression(fnCall)

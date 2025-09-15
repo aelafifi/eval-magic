@@ -2,7 +2,7 @@ import { hasOwnProp } from "../utils";
 import { binaryOperatorsMap, unaryOperatorsMap } from "../operators";
 import {
   ArrowFunctionExpression,
-  AssignmentExpression,
+  AssignmentExpression as AssignmentExpr,
   BlockStatement,
   CallExpression,
   ExpressionStatement,
@@ -12,7 +12,7 @@ import {
   TryStatement,
 } from "../node-generator";
 import { StepInfo } from "estree-walk-plus";
-import * as acorn from "acorn"; // /**
+import * as acorn from "acorn";
 
 /**
  * Replace `++x` with
@@ -50,7 +50,7 @@ function postIncrement(id: acorn.Identifier, operator: string, state: any) {
           null,
           BlockStatement(
             ExpressionStatement(
-              AssignmentExpression(
+              AssignmentExpr(
                 id,
                 "=",
                 CallExpression(Identifier(state.binaryFnName), [
@@ -89,7 +89,7 @@ function updateAssign(
       [],
       BlockStatement(
         ExpressionStatement(
-          AssignmentExpression(
+          AssignmentExpr(
             id,
             "=",
             CallExpression(Identifier(state.binaryFnName), [
