@@ -91,9 +91,22 @@ describe('Operators', () => {
       expect(result).toBe(~5);
     });
 
-    it('should handle typeof operator', () => {
-      const result = $__('typeof', 'hello');
-      expect(result).toBe('string');
+    it('should handle void operator', () => {
+      const result = $__('void', 5);
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle void operator with expressions', () => {
+      const result = $__('void', 'any expression');
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle typeof operator with different types', () => {
+      expect($__('typeof', 'hello')).toBe('string');
+      expect($__('typeof', 42)).toBe('number');
+      expect($__('typeof', true)).toBe('boolean');
+      expect($__('typeof', {})).toBe('object');
+      expect($__('typeof', undefined)).toBe('undefined');
     });
 
     it('should handle custom unary operator on object', () => {
@@ -192,6 +205,20 @@ describe('Operators', () => {
       };
       const result = __$__(5, '+', obj);
       expect(result).toBe('custom reverse add with 5');
+    });
+
+    it('should handle logical operators', () => {
+      expect(__$__(true, '&&', false)).toBe(false);
+      expect(__$__(true, '||', false)).toBe(true);
+      expect(__$__(null, '??', 'default')).toBe('default');
+      expect(__$__(0, '??', 'default')).toBe(0); // 0 is not nullish
+    });
+
+    it('should handle strict equality edge cases', () => {
+      expect(__$__(0, '===', -0)).toBe(true);
+      expect(__$__(NaN, '===', NaN)).toBe(false);
+      expect(__$__(5, '===', '5')).toBe(false);
+      expect(__$__(5, '!==', '5')).toBe(true);
     });
 
     it('should handle in operator', () => {
@@ -332,7 +359,7 @@ describe('Operators', () => {
       }
 
       [Py.__ne__](other: Vector): boolean {
-        return !this[Py.__eq__](other as any);
+        return !(this.x === other.x && this.y === other.y);
       }
 
       [Py.__cmp__](other: Vector): number {
@@ -341,8 +368,27 @@ describe('Operators', () => {
         return thisMag - otherMag;
       }
 
+      [Py.__arithmetic__](other: any, defaultFn: Function): any {
+        if (typeof other === 'number') {
+          return defaultFn(this, other);
+        }
+        throw new Error('Unsupported arithmetic operation');
+      }
+
+      [Py.__logical__](other: any, defaultFn: Function): any {
+        return defaultFn(this, other);
+      }
+
       [Py.__neg__](): Vector {
         return new Vector(-this.x, -this.y);
+      }
+    }
+
+    class ComparisonObject {
+      constructor(public value: number) {}
+
+      [Py.__cmp__](other: ComparisonObject): number {
+        return this.value - other.value;
       }
     }
 
@@ -384,9 +430,197 @@ describe('Operators', () => {
       expect(result.y).toBe(2);
     });
 
-    it('should handle mixed types with fallback', () => {
-      const result = __$__(5, '+', '3');
-      expect(result).toBe('53'); // JavaScript default behavior
+    it('should handle comparison shorthand methods', () => {
+      const obj1 = new ComparisonObject(5);
+      const obj2 = new ComparisonObject(3);
+      const obj3 = new ComparisonObject(5);
+
+      expect(__$__(obj1, '>', obj2)).toBe(true);  // Uses __cmp__
+      expect(__$__(obj1, '<', obj2)).toBe(false); // Uses __cmp__
+      expect(__$__(obj1, '>=', obj3)).toBe(true); // Uses __cmp__
+      expect(__$__(obj1, '<=', obj3)).toBe(true); // Uses __cmp__
+      expect(__$__(obj1, '==', obj3)).toBe(true); // Uses __cmp__
+      expect(__$__(obj1, '!=', obj2)).toBe(true); // Uses __cmp__
     });
+
+    it('should handle arithmetic shorthand methods', () => {
+      const v = new Vector(2, 3);
+      
+      const result = __$__(v, '*', 2);
+      expect(result.x).toBe(4);
+      expect(result.y).toBe(6);
+    });
+
+    it('should handle logical shorthand methods', () => {
+      const v1 = new Vector(1, 0);
+      const v2 = new Vector(0, 1);
+      
+      const result = __$__(v1, '&&', v2);
+      expect(result).toBe(v2); // Default logical AND behavior
+    });
+
+    it('should fallback through multiple failed attempts', () => {
+      const obj = {
+        [Py.__add__]() {
+          throw new Error('First method fails');
+        }
+      };
+      
+      const result = __$__(obj, '+', 5);
+      expect(result).toBe('5'); // Falls back to default string coercion
+    });
+
+    it('should handle all fallback attempts failing gracefully', () => {
+      // This should use the default behavior since no custom methods exist
+      expect(__$__(3, '*', 4)).toBe(12);
+    });
+
+  describe('reversed operator scenarios', () => {
+    class LeftOperand {
+      constructor(public value: number) {}
+      
+      // No direct operators, should trigger reversed operators on right operand
+    }
+    
+    class RightOperand {
+      constructor(public value: number) {}
+      
+      [Py.__radd__](other: LeftOperand): number {
+        return other.value + this.value;
+      }
+      
+      [Py.__rsub__](other: LeftOperand): number {
+        return other.value - this.value;
+      }
+      
+      [Py.__rmul__](other: LeftOperand): number {
+        return other.value * this.value;
+      }
+      
+      [Py.__rdiv__](other: LeftOperand): number {
+        return other.value / this.value;
+      }
+      
+      [Py.__rmod__](other: LeftOperand): number {
+        return other.value % this.value;
+      }
+      
+      [Py.__rpow__](other: LeftOperand): number {
+        return other.value ** this.value;
+      }
+      
+      [Py.__rlshift__](other: LeftOperand): number {
+        return other.value << this.value;
+      }
+      
+      [Py.__rrshift__](other: LeftOperand): number {
+        return other.value >> this.value;
+      }
+      
+      [Py.__rurshift__](other: LeftOperand): number {
+        return other.value >>> this.value;
+      }
+      
+      [Py.__rxor__](other: LeftOperand): number {
+        return other.value ^ this.value;
+      }
+      
+      [Py.__rbitwise_and__](other: LeftOperand): number {
+        return other.value & this.value;
+      }
+      
+      [Py.__rbitwise_or__](other: LeftOperand): number {
+        return other.value | this.value;
+      }
+      
+      [Py.__rand__](other: LeftOperand): any {
+        return other.value && this.value;
+      }
+      
+      [Py.__ror__](other: LeftOperand): any {
+        return other.value || this.value;
+      }
+      
+      [Py.__rnullish__](other: LeftOperand): any {
+        return other.value ?? this.value;
+      }
+    }
+
+    it('should handle reversed arithmetic operators', () => {
+      const left = new LeftOperand(10);
+      const right = new RightOperand(3);
+      
+      expect(__$__(left, '+', right)).toBe(13);
+      expect(__$__(left, '-', right)).toBe(7);
+      expect(__$__(left, '*', right)).toBe(30);
+      expect(__$__(left, '/', right)).toBe(3.3333333333333335);
+      expect(__$__(left, '%', right)).toBe(1);
+      expect(__$__(left, '**', right)).toBe(1000);
+    });
+
+    it('should handle reversed bitwise operators', () => {
+      const left = new LeftOperand(12); // 1100 in binary
+      const right = new RightOperand(3); // 0011 in binary
+      
+      expect(__$__(left, '<<', right)).toBe(96); // 12 << 3 = 96
+      expect(__$__(left, '>>', right)).toBe(1);  // 12 >> 3 = 1
+      expect(__$__(left, '>>>', right)).toBe(1); // 12 >>> 3 = 1
+      expect(__$__(left, '^', right)).toBe(15);  // 12 ^ 3 = 15
+      expect(__$__(left, '&', right)).toBe(0);   // 12 & 3 = 0
+      expect(__$__(left, '|', right)).toBe(15);  // 12 | 3 = 15
+    });
+
+    it('should handle reversed logical operators', () => {
+      const left = new LeftOperand(5);
+      const right = new RightOperand(0);
+      
+      expect(__$__(left, '&&', right)).toBe(0);
+      expect(__$__(left, '||', right)).toBe(5);
+      expect(__$__(left, '??', right)).toBe(5);
+    });
+  });
+
+  describe('direct operator testing', () => {
+    it('should test void operator directly', () => {
+      // This should hit line 81 in operators.ts
+      const obj = {
+        [Py.__void__]: null // no method, will fall back to default
+      };
+      const result = $__('void', obj);
+      expect(result).toBe(undefined);
+    });
+
+    it('should test binary default actions directly', () => {
+      // Test lines 101-108 and 118-138 by forcing fallback to defaults
+      const result1 = __$__(5, '!=', 3);   // line 101
+      const result2 = __$__(5, '<', 10);   // line 102  
+      const result3 = __$__(5, '<=', 5);   // line 103
+      const result4 = __$__(10, '>', 5);   // line 104
+      const result5 = __$__(10, '>=', 10); // line 105
+      const result6 = __$__(5, '===', 5);  // line 106
+      const result7 = __$__(5, '!==', '5');// line 107
+      
+      expect(result1).toBe(true);
+      expect(result2).toBe(true);
+      expect(result3).toBe(true);
+      expect(result4).toBe(true);
+      expect(result5).toBe(true);
+      expect(result6).toBe(true);
+      expect(result7).toBe(true);
+    });
+
+    it('should test reversed default operators', () => {
+      // Force fallback to reversed default actions (lines 118-138)
+      // We need objects that fail on normal operators but succeed on reversed
+      const mockLeft = {};
+      const mockRight = {
+        [Py.__radd__]: function() { throw new Error('fail'); }
+      };
+      
+      // This should eventually fall back to default: b + a
+      const result = __$__(mockLeft, '+', 'test');
+      expect(result).toBe('test'); // String coercion of mockLeft + 'test'
+    });
+  });
   });
 });

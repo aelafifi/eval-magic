@@ -284,12 +284,12 @@ describe('Transformer', () => {
       const state1 = transformer.transform(ast1);
       const state2 = transformer.transform(ast2);
       
-      expect(state1.hasAwait).toBe(false);
-      expect(state2.hasAwait).toBe(true);
-      expect(state1.identifiers.has('x')).toBe(true);
-      expect(state1.identifiers.has('y')).toBe(false);
-      expect(state2.identifiers.has('y')).toBe(true);
-      expect(state2.identifiers.has('promise')).toBe(true);
+      expect((state1 as any).hasAwait).toBe(false);
+      expect((state2 as any).hasAwait).toBe(true);
+      expect((state1 as any).identifiers.has('x')).toBe(true);
+      expect((state1 as any).identifiers.has('y')).toBe(false);
+      expect((state2 as any).identifiers.has('y')).toBe(true);
+      expect((state2 as any).identifiers.has('promise')).toBe(true);
     });
 
     it('should reset state for each transformation', () => {
@@ -302,10 +302,10 @@ describe('Transformer', () => {
       const state1 = transformer.transform(ast1);
       const state2 = transformer.transform(ast2);
       
-      expect(state1.binaryFnUsed).toBe(true);
-      expect(state2.binaryFnUsed).toBe(false);
-      expect(state1.identifiers.has('x')).toBe(true);
-      expect(state2.identifiers.has('x')).toBe(false);
+      expect((state1 as any).binaryFnUsed).toBe(true);
+      expect((state2 as any).binaryFnUsed).toBe(false);
+      expect((state1 as any).identifiers.has('x')).toBe(true);
+      expect((state2 as any).identifiers.has('x')).toBe(false);
     });
   });
 

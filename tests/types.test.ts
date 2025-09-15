@@ -142,7 +142,7 @@ describe('Types', () => {
     it('should have correct property types', () => {
       const mockFn = () => 42;
       const mockArgs = [1, 2, 3];
-      const mockRun = () => mockFn(...mockArgs);
+      const mockRun = () => (mockFn as any)(...mockArgs);
 
       const compiledCode: CompiledCode = {
         origCode: 'x + y',
@@ -162,7 +162,7 @@ describe('Types', () => {
     it('should execute run function correctly', () => {
       const mockFn = jest.fn(() => 'result');
       const mockArgs = ['arg1', 'arg2'];
-      const mockRun = jest.fn(() => mockFn(...mockArgs));
+      const mockRun = jest.fn(() => (mockFn as any)(...mockArgs));
 
       const compiledCode: CompiledCode = {
         origCode: 'test code',

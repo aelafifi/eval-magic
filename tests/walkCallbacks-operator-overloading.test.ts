@@ -226,6 +226,22 @@ describe('Operator Overloading WalkCallbacks', () => {
       });
     });
 
+    it('should not transform unsupported operators', () => {
+      const mockStep = {
+        _node: {
+          operator: '@', // Unsupported operator
+          left: { type: 'Identifier', name: 'x' },
+          right: { type: 'Identifier', name: 'y' },
+        },
+        replaceWith: jest.fn(),
+      };
+
+      BinaryExpression(mockStep as any, mockState);
+
+      expect(mockState.binaryFnUsed).toBe(false);
+      expect(mockStep.replaceWith).not.toHaveBeenCalled();
+    });
+
     it('should handle complex operands', () => {
       const mockStep = {
         _node: {
@@ -530,6 +546,22 @@ describe('Operator Overloading WalkCallbacks', () => {
       AssignmentExpression(mockStep as any, mockState);
 
       // Should not transform if operator not in binaryOperatorsMap
+    });
+
+    it('should not transform unsupported operators', () => {
+      const mockStep = {
+        _node: {
+          operator: '@=', // Unsupported operator (@ is not in binaryOperatorsMap)
+          left: { type: 'Identifier', name: 'x' },
+          right: { type: 'Literal', value: 5 },
+        },
+        replaceWith: jest.fn(),
+      };
+
+      AssignmentExpression(mockStep as any, mockState);
+
+      expect(mockState.binaryFnUsed).toBe(false);
+      expect(mockStep.replaceWith).not.toHaveBeenCalled();
     });
 
     it('should not transform non-identifier left-hand side', () => {

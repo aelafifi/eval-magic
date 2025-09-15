@@ -80,6 +80,16 @@ describe('Interpreter', () => {
       expect(result).toEqual({ value: 42 });
     });
 
+    it('should work with no parameters at all', () => {
+      const result = evaluate('export const value = 42');
+      expect(result).toEqual({ value: 42 });
+    });
+
+    it('should work with minimal compile parameters', () => {
+      const compiled = compile('export const value = 10');
+      expect(compiled.run()).toEqual({ value: 10 });
+    });
+
     it('should throw error for invalid code', () => {
       expect(() => {
         evaluate('invalid syntax {[}', {}, { returns: 'return' });
@@ -207,8 +217,8 @@ describe('Interpreter', () => {
 
   describe('edge cases', () => {
     it('should handle undefined globals', () => {
-      const result = evaluate('return typeof x', {}, { returns: 'return' });
-      expect(result).toBe('undefined');
+      const result = evaluate('export const typeOfX = typeof x', {}, { returns: 'exports' });
+      expect(result.typeOfX).toBe('undefined');
     });
 
     it('should handle null values', () => {

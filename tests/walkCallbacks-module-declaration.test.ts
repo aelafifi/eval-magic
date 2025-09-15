@@ -385,9 +385,14 @@ describe('Module Declaration WalkCallbacks', () => {
       const mockStep = {
         _node: {
           declaration: {
-            id: {
-              type: 'UnknownPattern',
-            },
+            type: 'VariableDeclaration',
+            declarations: [
+              {
+                id: {
+                  type: 'UnknownPattern',
+                },
+              },
+            ],
           },
           source: null,
           specifiers: null,
