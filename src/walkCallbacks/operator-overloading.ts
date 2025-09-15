@@ -12,7 +12,7 @@ import {
   TryStatement,
 } from "../node-generator";
 import { StepInfo } from "estree-walk-plus";
-import * as acorn from "acorn"; // /**
+import * as acorn from "acorn";
 
 /**
  * Replace `++x` with

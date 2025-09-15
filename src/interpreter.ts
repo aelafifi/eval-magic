@@ -18,7 +18,6 @@ export function compile(
     codegenOptions: {},
     returns: "exports",
     operatorOverloading: true,
-    customVisitors: {},
     isAsync: false,
     ...options,
   };
@@ -34,9 +33,6 @@ export function compile(
 
   if (typeof options.importFunction === "function") {
     options.parseOptions!.sourceType = "module";
-    if (options.importFunction instanceof AsyncFunction) {
-      options.isAsync = true;
-    }
   }
 
   const parseTree = acorn.parse(code, options.parseOptions as any);
