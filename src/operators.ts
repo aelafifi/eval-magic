@@ -138,7 +138,7 @@ const binaryDefaultActions: Record<symbol, (a: any, b: any) => any> = {
   [Py.__rnullish__]: (a: any, b: any) => b ?? a,
 };
 
-const opposites = {
+const opposites: Record<symbol, symbol> = {
   // Binary Operators
   [Py.__add__]: Py.__radd__,
   [Py.__sub__]: Py.__rsub__,
@@ -162,7 +162,6 @@ const opposites = {
   [Py.__instanceof__]: Py.__rinstanceof__,
   [Py.__bitwise_and__]: Py.__rbitwise_and__,
   [Py.__bitwise_or__]: Py.__rbitwise_or__,
-  [Py.__and__]: Py.__rand__,
 
   // Logical Operators
   [Py.__and__]: Py.__rand__,
@@ -201,77 +200,80 @@ export const binaryOperatorsMap: Record<string, symbol> = {
   instanceof: Py.__instanceof__,
   "&": Py.__bitwise_and__,
   "|": Py.__bitwise_or__,
+  "&&": Py.__and__,
+  "||": Py.__or__,
+  "??": Py.__nullish__,
 };
 
-const binaryShorthandImpl = {
-  [Py.__eq__]: (left, right) => left[Py.__cmp__](right) === 0,
-  [Py.__ne__]: (left, right) => left[Py.__cmp__](right) !== 0,
-  [Py.__gt__]: (left, right) => left[Py.__cmp__](right) > 0,
-  [Py.__ge__]: (left, right) => left[Py.__cmp__](right) >= 0,
-  [Py.__lt__]: (left, right) => left[Py.__cmp__](right) < 0,
-  [Py.__le__]: (left, right) => left[Py.__cmp__](right) <= 0,
+const binaryShorthandImpl: Record<symbol, (left: any, right: any) => any> = {
+  [Py.__eq__]: (left: any, right: any) => left[Py.__cmp__](right) === 0,
+  [Py.__ne__]: (left: any, right: any) => left[Py.__cmp__](right) !== 0,
+  [Py.__gt__]: (left: any, right: any) => left[Py.__cmp__](right) > 0,
+  [Py.__ge__]: (left: any, right: any) => left[Py.__cmp__](right) >= 0,
+  [Py.__lt__]: (left: any, right: any) => left[Py.__cmp__](right) < 0,
+  [Py.__le__]: (left: any, right: any) => left[Py.__cmp__](right) <= 0,
 
-  [Py.__add__]: (left, right) =>
+  [Py.__add__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__add__]),
-  [Py.__radd__]: (left, right) =>
+  [Py.__radd__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__radd__]),
-  [Py.__sub__]: (left, right) =>
+  [Py.__sub__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__sub__]),
-  [Py.__rsub__]: (left, right) =>
+  [Py.__rsub__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rsub__]),
-  [Py.__mul__]: (left, right) =>
+  [Py.__mul__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__mul__]),
-  [Py.__rmul__]: (left, right) =>
+  [Py.__rmul__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rmul__]),
-  [Py.__div__]: (left, right) =>
+  [Py.__div__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__div__]),
-  [Py.__rdiv__]: (left, right) =>
+  [Py.__rdiv__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rdiv__]),
-  [Py.__mod__]: (left, right) =>
+  [Py.__mod__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__mod__]),
-  [Py.__rmod__]: (left, right) =>
+  [Py.__rmod__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rmod__]),
-  [Py.__pow__]: (left, right) =>
+  [Py.__pow__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__pow__]),
-  [Py.__rpow__]: (left, right) =>
+  [Py.__rpow__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rpow__]),
-  [Py.__lshift__]: (left, right) =>
+  [Py.__lshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__lshift__]),
-  [Py.__rlshift__]: (left, right) =>
+  [Py.__rlshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rlshift__]),
-  [Py.__rshift__]: (left, right) =>
+  [Py.__rshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rshift__]),
-  [Py.__rrshift__]: (left, right) =>
+  [Py.__rrshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rrshift__]),
-  [Py.__urshift__]: (left, right) =>
+  [Py.__urshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__urshift__]),
-  [Py.__rurshift__]: (left, right) =>
+  [Py.__rurshift__]: (left: any, right: any) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rurshift__]),
 
-  [Py.__xor__]: (left, right) =>
+  [Py.__xor__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__xor__]),
-  [Py.__rxor__]: (left, right) =>
+  [Py.__rxor__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__rxor__]),
-  [Py.__bitwise_and__]: (left, right) =>
+  [Py.__bitwise_and__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__bitwise_and__]),
-  [Py.__rbitwise_and__]: (left, right) =>
+  [Py.__rbitwise_and__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__rbitwise_and__]),
-  [Py.__bitwise_or__]: (left, right) =>
+  [Py.__bitwise_or__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__bitwise_or__]),
-  [Py.__rbitwise_or__]: (left, right) =>
+  [Py.__rbitwise_or__]: (left: any, right: any) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__rbitwise_or__]),
 
-  [Py.__and__]: (left, right) =>
+  [Py.__and__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__and__]),
-  [Py.__rand__]: (left, right) =>
+  [Py.__rand__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__rand__]),
-  [Py.__or__]: (left, right) =>
+  [Py.__or__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__or__]),
-  [Py.__ror__]: (left, right) =>
+  [Py.__ror__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__ror__]),
-  [Py.__nullish__]: (left, right) =>
+  [Py.__nullish__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__nullish__]),
-  [Py.__rnullish__]: (left, right) =>
+  [Py.__rnullish__]: (left: any, right: any) =>
     left[Py.__logical__](right, binaryDefaultActions[Py.__rnullish__]),
 };
 
@@ -304,9 +306,16 @@ export function __$__(left: any, operator: any, right: any) {
 
   return tryCatchSeq(
     () => left[sym].call(left, right),
-    () => right[opposites[sym]].call(right, left),
-    () => left[binaryShorthandImpl[sym]].call(left, right),
-    () => right[binaryShorthandImpl[opposites[sym]]].call(right, left),
+    () => right[opposites[sym as keyof typeof opposites]].call(right, left),
+    () => {
+      const impl = binaryShorthandImpl[sym];
+      return impl ? impl.call(left, left, right) : undefined;
+    },
+    () => {
+      const reverseOp = opposites[sym as keyof typeof opposites];
+      const impl = binaryShorthandImpl[reverseOp];
+      return impl ? impl.call(right, right, left) : undefined;
+    },
     () => binaryDefaultActions[sym](left, right),
   );
 }
