@@ -162,7 +162,6 @@ const opposites = {
   [Py.__instanceof__]: Py.__rinstanceof__,
   [Py.__bitwise_and__]: Py.__rbitwise_and__,
   [Py.__bitwise_or__]: Py.__rbitwise_or__,
-  [Py.__and__]: Py.__rand__,
 
   // Logical Operators
   [Py.__and__]: Py.__rand__,
