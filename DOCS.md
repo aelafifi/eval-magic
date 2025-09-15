@@ -31,14 +31,13 @@ An object containing variables and functions to make available in the code's exe
 #### `options?: RunOptions` (optional)
 Configuration options for parsing, transforming, and executing the code.
 
-**Default:** 
+**Default:**
 ```typescript
 {
   parseOptions: { ecmaVersion: "latest" },
   codegenOptions: {},
   returns: "exports",
   operatorOverloading: true,
-  customVisitors: {},
   isAsync: false
 }
 ```
