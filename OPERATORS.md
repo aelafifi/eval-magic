@@ -69,6 +69,10 @@ const p2 = -p1; // Point(-3, -4)
 **JavaScript equivalent:** `void obj`  
 **Default behavior:** `void a`
 
+### `__delete__` ❌
+**Status:** Not available  
+**Reason:** Cannot set a default action for the delete operator in JavaScript
+
 ## Binary Operators
 
 ### Arithmetic Operators
