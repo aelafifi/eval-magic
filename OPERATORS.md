@@ -308,6 +308,68 @@ These are convenience operators that allow you to define behavior for multiple r
 **Purpose:** Custom arithmetic shorthand  
 **Usage:** Called by all arithmetic operators when they delegate to this method
 
+Instead of implementing individual arithmetic methods (`__add__`, `__sub__`, `__mul__`, etc.), you can implement a single `__arithmetic__` method that handles all arithmetic operations.
+
+**Example:**
+```javascript
+import { Py } from "eval-magic";
+
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    // Single method to handle all arithmetic operations
+    [Py.__arithmetic__](other, defaultAction) {
+        // Convert other to Point if it's not already
+        const otherPoint = this.pointify(other);
+        
+        // Use the defaultAction to determine which operation was called
+        // The defaultAction contains the native JavaScript behavior
+        const result = defaultAction(
+            { x: this.x, y: this.y }, 
+            { x: otherPoint.x, y: otherPoint.y }
+        );
+        
+        return new Point(result.x, result.y);
+    }
+    
+    pointify(value) {
+        if (value instanceof Point) return value;
+        if (Array.isArray(value) && value.length === 2) {
+            return new Point(value[0], value[1]);
+        }
+        if (typeof value === 'object' && 'x' in value && 'y' in value) {
+            return new Point(value.x, value.y);
+        }
+        if (typeof value === 'number') {
+            return new Point(value, value);
+        }
+        throw new TypeError('Cannot convert to Point');
+    }
+    
+    toString() {
+        return `Point(${this.x}, ${this.y})`;
+    }
+}
+
+// Usage - all these operations work through the single __arithmetic__ method:
+const p1 = new Point(10, 20);
+const p2 = new Point(5, 10);
+
+console.log((p1 + p2).toString());  // Point(15, 30)
+console.log((p1 - p2).toString());  // Point(5, 10) 
+console.log((p1 * 2).toString());   // Point(20, 40)
+console.log((p1 / [2, 4]).toString()); // Point(5, 5)
+```
+
+**How it works:**
+- When you use `p1 + p2`, eval-magic calls `p1[Py.__arithmetic__](p2, defaultAddAction)`
+- When you use `p1 * 2`, eval-magic calls `p1[Py.__arithmetic__](2, defaultMulAction)`
+- The `defaultAction` parameter contains the native JavaScript operation behavior
+- Your `__arithmetic__` method can then apply this operation to your custom data structure
+
 ### `__bitwise__`
 **Purpose:** Custom bitwise shorthand  
 **Usage:** Called by all bitwise operators when they delegate to this method
