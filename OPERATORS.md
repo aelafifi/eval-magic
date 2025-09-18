@@ -325,14 +325,12 @@ class Point {
         // Convert other to Point if it's not already
         const otherPoint = this.pointify(other);
         
-        // Use the defaultAction to determine which operation was called
-        // The defaultAction contains the native JavaScript behavior
-        const result = defaultAction(
-            { x: this.x, y: this.y }, 
-            { x: otherPoint.x, y: otherPoint.y }
+        // Apply the defaultAction to individual components
+        // The defaultAction contains the native JavaScript behavior for primitives
+        return new Point(
+            defaultAction(this.x, otherPoint.x),
+            defaultAction(this.y, otherPoint.y)
         );
-        
-        return new Point(result.x, result.y);
     }
     
     pointify(value) {
@@ -367,8 +365,8 @@ console.log((p1 / [2, 4]).toString()); // Point(5, 5)
 **How it works:**
 - When you use `p1 + p2`, eval-magic calls `p1[Py.__arithmetic__](p2, defaultAddAction)`
 - When you use `p1 * 2`, eval-magic calls `p1[Py.__arithmetic__](2, defaultMulAction)`
-- The `defaultAction` parameter contains the native JavaScript operation behavior
-- Your `__arithmetic__` method can then apply this operation to your custom data structure
+- The `defaultAction` parameter contains the native JavaScript operation behavior for primitives
+- Your `__arithmetic__` method applies this operation to the individual components of your data structure
 
 ### `__bitwise__`
 **Purpose:** Custom bitwise shorthand  
