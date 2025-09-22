@@ -88,8 +88,6 @@ Configuration options for parsing, transforming, and executing the code.
   **Note:** Even with explicit `isAsync: false`, the function returned by compile will still return a promise (will be async) if:
   - Any `await` keyword appears in the code
   - Your code has import statements, and the passed importFunction is async
-  
-  **TODO:** Check for await keywords - they should affect the async behavior only if they are used on the root level, because if they are used internally in an async function defined in the code, they shouldn't change the compile function behavior.
 
 ### Return Value
 
@@ -373,3 +371,4 @@ For different inputs, you would typically use parameter passing or recompile wit
 ## TODOs
 
 - [ ] Allow compiled functions to be called with different `globals` several times without the need to re-compile
+- [ ] Check for await keywords - they should affect the async behavior only if they are used on the root level, because if they are used internally in an async function defined in the code, they shouldn't change the compile function behavior.
