@@ -4,11 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "build:node": "esbuild ./src/index.ts --bundle --outfile=index.js --packages=external --platform=node",
-    "build:browser": "esbuild ./src/index.ts --bundle --outfile=index.js --platform=browser --global-name=executejs --minify",
-    "build:all": "npm run build && npm run build:browser",
-    "prepublishOnly": "npm run build:all"
+    "build:ts": "tsc",
+    "build:node": "esbuild ./src/index.ts --bundle --outfile=./build/index.js --platform=node --format=cjs",
+    "build:types": "tsc --emitDeclarationOnly --declaration --outDir ./build",
+    "build": "npm run build:ts && npm run build:node && npm run build:types",
+    "prepublishOnly": "npm run build"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "require": "./build/index.js",
+      "types": "./build/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "keywords": [],
   "author": "ahmed.s.elafifi@gmail.com",
