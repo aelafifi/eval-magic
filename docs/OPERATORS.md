@@ -489,3 +489,165 @@ console.log((c1 + c2).toString()); // "4+6i"
 console.log((c1 * 2).toString());  // "6+8i"
 console.log(c1 == c1);             // true
 ```
+
+### Example: Comprehensive Point Class
+
+Here's a complete example showing how to implement a Point class with extensive operator overloading:
+
+```javascript
+import { Py } from "eval-magic";
+
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    pointify(value, allowSingleNumber = true) {
+        // Point(x, y) -> return as is
+        if (value instanceof Point) {
+            return value;
+        }
+        
+        // [x, y] -> Point(x, y)
+        if (Array.isArray(value) && value.length === 2) {
+            return new Point(value[0], value[1]);
+        }
+        
+        // {x: x, y: y} -> Point(x, y)
+        if (typeof value === 'object' && 'x' in value && 'y' in value) {
+            return new Point(value.x, value.y);
+        }
+        
+        // number -> Point(number, number)
+        if (typeof value === 'number' && allowSingleNumber) {
+            return new Point(value, value);
+        }
+        
+        // Otherwise, throw an error
+        throw new TypeError("Cannot convert to Point: " + value);
+    }
+
+    [Py.__add__](other) {
+        // Allow adding any Point-like object or a number
+        // Usage: p1 + p2, p1 + [x, y], p1 + {x: x, y: y}, p1 + number
+        other_p = this.pointify(other);
+        return new Point(this.x + other_p.x, this.y + other_p.y);
+    }
+
+    [Py.__radd__](other) {
+        // Allow adding an array [x, y] to Point
+        // Usage: [x, y] + p1
+        return this[Py.__add__](other);
+    }
+    
+    [Py.__sub__](other) {
+        // Allow subtracting any Point-like object or a number
+        other_p = this.pointify(other);
+        return new Point(this.x - other_p.x, this.y - other_p.y);
+    }
+    
+    [Py.__rsub__](other) {
+        // Allow subtracting Point from an array [x, y]
+        // Usage: [x, y] - p1
+        other_p = this.pointify(other);
+        return other_p[Py.__sub__](this);
+    }
+    
+    [Py.__mul__](other) {
+        // Allow multiplying by any Point-like object or a number
+        other_p = this.pointify(other);
+        return new Point(this.x * other_p.x, this.y * other_p.y);
+    }
+    
+    [Py.__rmul__](other) {
+        // Allow multiplying an array [x, y] by Point
+        return this[Py.__mul__](other);
+    }
+    
+    [Py.__div__](other) {
+        // Allow dividing by any Point-like object or a number
+        other_p = this.pointify(other);
+        return new Point(this.x / other_p.x, this.y / other_p.y);
+    }
+    
+    [Py.__rdiv__](other) {
+        // Allow dividing an array [x, y] by Point
+        other_p = this.pointify(other);
+        return other_p[Py.__div__](this);
+    }
+    
+    [Py.__mod__](other) {
+        // Allow modulus by any Point-like object or a number
+        other_p = this.pointify(other);
+        return new Point(this.x % other_p.x, this.y % other_p.y);
+    }
+    
+    [Py.__rmod__](other) {
+        // Allow modulus of an array [x, y] by Point
+        other_p = this.pointify(other);
+        return other_p[Py.__mod__](this);
+    }
+    
+    [Py.__pow__](other) {
+        // Allow power by any Point-like object or a number
+        other_p = this.pointify(other);
+        return new Point(this.x ** other_p.x, this.y ** other_p.y);
+    }
+    
+    [Py.__rpow__](other) {
+        // Allow power of an array [x, y] by Point
+        other_p = this.pointify(other);
+        return other_p[Py.__pow__](this);
+    }
+    
+    [Py.__neg__]() {
+        // Negate the point
+        // Usage: -p1
+        return new Point(-this.x, -this.y);
+    }
+
+    [Py.__rshift__](other) {
+        // Get angle between two points
+        // Usage: p1 >> p2
+        if (other instanceof Point) {
+            const dx = this.x - other.x;
+            const dy = this.y - other.y;
+            return Math.atan2(dy, dx) * (180 / Math.PI);
+        }
+        throw new TypeError("Unsupported operand type(s) for >>: 'Point' and '" + typeof other + "'");
+    }
+
+    [Py.__lshift__](other) {
+        // Get angle between two points (in the opposite direction)
+        // Usage: p1 << p2
+        return other[Py.__rshift__](this);
+    }
+
+    [Py.__urshift__](other) {
+        // Get distance between two points
+        // Usage: p1 >>> p2
+        if (other instanceof Point) {
+            const dx = this.x - other.x;
+            const dy = this.y - other.y;
+            return Math.hypot(dx, dy);
+        }
+        throw new TypeError("Unsupported operand type(s) for >>>: 'Point' and '" + typeof other + "'");
+    }
+
+    toString() {
+        return `Point(${this.x}, ${this.y})`;
+    }
+}
+
+// Usage examples
+const p1 = new Point(1, 2);
+const p2 = new Point(3, 4);
+
+console.log((p1 + p2).toString());  // Point(4, 6)
+console.log((p1 * 2).toString());   // Point(2, 4)
+console.log((p1 >> p2));            // Angle between points
+console.log((p1 >>> p2));           // Distance between points
+```
+
+**Note:** When implementing operator methods, you can throw a `PassToDefaultBehavior` error to let eval-magic fall back to the next available implementation in the sequence, ultimately falling back to JavaScript's default behavior if no custom method handles the operation.
