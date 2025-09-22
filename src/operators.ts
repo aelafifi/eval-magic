@@ -1,3 +1,5 @@
+import { PassToDefaultBehavior } from "../errors";
+
 export const Py = {
   // 1. Unary Operators
   __pos__: Symbol.for("__pos__"),
@@ -290,7 +292,7 @@ export function tryCatchSeq(...fns: (() => any)[]) {
     try {
       return fn();
     } catch (e) {
-      if (rest.length > 0) {
+      if (e instanceof PassToDefaultBehavior && rest.length > 0) {
         return tryCatchSeq(...rest);
       }
       throw e;
@@ -301,11 +303,23 @@ export function tryCatchSeq(...fns: (() => any)[]) {
 export function __$__(left: any, operator: any, right: any) {
   const sym = binaryOperatorsMap[operator];
 
+  const sequence = [
+    // fn, a, b
+    [left[sym], left, right],
+    [right[opposites[sym]], right, left],
+    [left[binaryShorthandImpl[sym]], left, right],
+    [right[binaryShorthandImpl[opposites[sym]]], right, left],
+    [binaryDefaultActions[sym], left, right],
+  ];
+
   return tryCatchSeq(
-    () => left[sym].call(left, right),
-    () => right[opposites[sym]].call(right, left),
-    () => left[binaryShorthandImpl[sym]].call(left, right),
-    () => right[binaryShorthandImpl[opposites[sym]]].call(right, left),
-    () => binaryDefaultActions[sym](left, right),
+    ...sequence.map(([fn, a, b]) => () => {
+      return () => {
+        if (typeof fn === "function") {
+          return fn(a, b);
+        }
+        throw new PassToDefaultBehavior();
+      };
+    }),
   );
 }
