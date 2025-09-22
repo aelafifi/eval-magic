@@ -340,3 +340,7 @@ Configuration options for parsing, transforming, and executing code.
   > Wraps code in an async function, allowing top-level await (default: false). \
   > Note: If options.importFunction is defined as async, this will be set to true automatically.
 
+## TODOs
+
+- [ ] Allow compiled functions to be called with different `globals` several times without the need to re-compile
+- [ ] Check for await keywords - they should affect the async behavior only if they are used on the root level, because if they are used internally in an async function defined in the code, they shouldn't change the compile function behavior.
