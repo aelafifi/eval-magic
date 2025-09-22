@@ -310,6 +310,8 @@ class Point {
 }
 ```
 
+> **Note:** When implementing operator methods, you can throw a `PassToDefaultBehavior` error to let eval-magic fall back to the next available implementation in the sequence, ultimately falling back to JavaScript's default behavior if no custom method handles the operation.
+
 ## API Reference
 
 ### interface RunOptions

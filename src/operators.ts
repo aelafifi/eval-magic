@@ -1,4 +1,4 @@
-import { PassToDefaultBehavior } from "../errors";
+import { PassToDefaultBehavior } from "./errors";
 
 export const Py = {
   // 1. Unary Operators
