@@ -307,8 +307,8 @@ export function __$__(left: any, operator: any, right: any) {
     // fn, a, b
     [left[sym], left, right],
     [right[opposites[sym]], right, left],
-    [left[binaryShorthandImpl[sym]], left, right],
-    [right[binaryShorthandImpl[opposites[sym]]], right, left],
+    [binaryShorthandImpl[left[sym]], left, right],
+    [binaryShorthandImpl[right[opposites[sym]]], right, left],
     [binaryDefaultActions[sym], left, right],
   ];
 
