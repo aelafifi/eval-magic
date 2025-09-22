@@ -514,7 +514,6 @@ interface RunOptions {
   codegenOptions?: escodegen.GenerateOptions;
   returns?: "exports" | "return";
   operatorOverloading?: boolean;
-  customVisitors?: Record<string, VisitorFn>;
   importFunction?: (source: string) => Object | Promise<Object>;
   isAsync?: boolean;
 }
@@ -571,22 +570,6 @@ Enables Python-like operator overloading via magic methods.
 **Default:** `true`
 
 When enabled, operators like `+`, `-`, `*` are transformed to check for magic methods like `Py.__add__`, `Py.__sub__`, etc.
-
-#### `customVisitors?: Record<string, VisitorFn>`
-
-Custom AST visitors for additional code transformations beyond the built-in ones.
-
-**Example:**
-```javascript
-{
-  customVisitors: {
-    BinaryExpression: (node, state) => {
-      // Custom transformation for binary expressions
-      console.log('Processing binary expression:', node.operator);
-    }
-  }
-}
-```
 
 #### `importFunction?: (source: string) => Object | Promise<Object>`
 
