@@ -1,5 +1,24 @@
 # API Documentation
 
+## How Eval-Magic Works
+
+Eval-Magic transforms and evaluates JavaScript code through a sophisticated multi-step process:
+
+### 1. AST Parsing & Transformation
+The input JavaScript code is parsed into an Abstract Syntax Tree (AST) using the Acorn parser. This allows eval-magic to analyze and transform the code structure before execution.
+
+### 2. Operator Overloading
+When enabled, operator expressions (like `+`, `-`, `*`, etc.) are rewritten to call special magic methods on objects. This enables Python-like operator overloading in JavaScript without language-level changes.
+
+### 3. Custom Import Handling
+Import statements can be processed by a user-defined function, allowing for custom module resolution, mocking, or dynamic imports that would otherwise be impossible in eval contexts.
+
+### 4. Export Interception
+Instead of using `return`, you can use `export` statements in your code snippets. Eval-magic intercepts these exports, making it easier to write modular code that doesn't interrupt natural code flow.
+
+### 5. Scoped Execution
+The transformed code is generated back to JavaScript and executed in a controlled scope. This scope is merged with the global scope when needed, providing both isolation and access to necessary globals.
+
 ## `compile` Function
 
 The `compile` function is the core functionality of eval-magic that parses, transforms, and prepares JavaScript code for execution with enhanced features like operator overloading, custom imports, and export handling.
@@ -412,6 +431,193 @@ const results = [1, 2, 3, 4, 5].map(num => {
 ```
 
 For different inputs, you would typically use parameter passing or recompile with new globals as needed.
+
+## `evaluate` Function
+
+The `evaluate` function is a convenience wrapper around `compile` that immediately executes the compiled code and returns the result.
+
+### Signature
+
+```typescript
+function evaluate(
+  code: string,
+  globals?: Record<string, any>,
+  options?: RunOptions
+): any
+```
+
+### Parameters
+
+The parameters are identical to the `compile` function:
+
+- **`code: string`** - The JavaScript code to evaluate
+- **`globals?: Record<string, any>`** - Variables to make available in the execution scope
+- **`options?: RunOptions`** - Configuration options for parsing and execution
+
+### Return Value
+
+Returns the direct result of executing the compiled code, which depends on the `options.returns` setting:
+
+- When `returns: "exports"` (default): Returns an object containing all exported values
+- When `returns: "return"`: Returns the value from the return statement
+
+### Usage Examples
+
+```javascript
+import { evaluate } from "eval-magic";
+
+// Basic evaluation with exports
+const result = evaluate(
+    `export const sum = x + y;
+     export const product = x * y;`,
+    { x: 5, y: 3 }
+);
+console.log(result); // { sum: 8, product: 15 }
+
+// Using return instead of export
+const value = evaluate(
+    `return x + y;`,
+    { x: 10, y: 20 },
+    { returns: "return" }
+);
+console.log(value); // 30
+
+// With custom imports
+const result = await evaluate(
+    `import { sqrt } from "math";
+     export const root = sqrt(x);`,
+    { x: 16 },
+    {
+        importFunction: async (moduleName) => {
+            if (moduleName === "math") {
+                return { sqrt: Math.sqrt };
+            }
+            throw new Error("Module not found: " + moduleName);
+        }
+    }
+);
+console.log(result); // { root: 4 }
+```
+
+### When to Use `evaluate` vs `compile`
+
+- **Use `evaluate`** when you need to execute code once and get immediate results
+- **Use `compile`** when you want to reuse the compiled code multiple times, inspect the generated code, or have more control over execution
+
+## RunOptions Interface
+
+The `RunOptions` interface provides comprehensive configuration for how eval-magic parses, transforms, and executes code.
+
+```typescript
+interface RunOptions {
+  parseOptions?: Partial<acorn.Options>;
+  codegenOptions?: escodegen.GenerateOptions;
+  returns?: "exports" | "return";
+  operatorOverloading?: boolean;
+  customVisitors?: Record<string, VisitorFn>;
+  importFunction?: (source: string) => Object | Promise<Object>;
+  isAsync?: boolean;
+}
+```
+
+### Properties
+
+#### `parseOptions?: Partial<acorn.Options>`
+
+Options passed to the Acorn parser for JavaScript parsing.
+
+**Default:**
+```javascript
+{
+  ecmaVersion: "latest",
+  sourceType: "module", // when returns === "exports"
+  allowReturnOutsideFunction: true // when returns === "return"
+}
+```
+
+**Common Options:**
+- `ecmaVersion`: JavaScript version (e.g., 2020, "latest")
+- `sourceType`: "script" or "module"
+- `allowReturnOutsideFunction`: Allow return statements at top level
+
+#### `codegenOptions?: escodegen.GenerateOptions`
+
+Options passed to Escodegen for code generation from the transformed AST.
+
+**Example:**
+```javascript
+{
+  format: {
+    indent: {
+      style: "  " // 2-space indentation
+    },
+    newline: "\n",
+    space: " "
+  }
+}
+```
+
+#### `returns?: "exports" | "return"`
+
+Defines how the code returns values:
+
+- **`"exports"`** (default): Use export statements anywhere in code
+- **`"return"`**: Use standard JavaScript return statements
+
+#### `operatorOverloading?: boolean`
+
+Enables Python-like operator overloading via magic methods.
+
+**Default:** `true`
+
+When enabled, operators like `+`, `-`, `*` are transformed to check for magic methods like `Py.__add__`, `Py.__sub__`, etc.
+
+#### `customVisitors?: Record<string, VisitorFn>`
+
+Custom AST visitors for additional code transformations beyond the built-in ones.
+
+**Example:**
+```javascript
+{
+  customVisitors: {
+    BinaryExpression: (node, state) => {
+      // Custom transformation for binary expressions
+      console.log('Processing binary expression:', node.operator);
+    }
+  }
+}
+```
+
+#### `importFunction?: (source: string) => Object | Promise<Object>`
+
+Custom import handler for resolving import statements in the code.
+
+**Parameters:**
+- `source`: The module specifier string from the import statement
+
+**Returns:** An object representing the module, or a Promise resolving to such an object
+
+**Example:**
+```javascript
+importFunction: async (moduleName) => {
+  switch (moduleName) {
+    case "lodash":
+      return await import("lodash");
+    case "math":
+      return { sqrt: Math.sqrt, pow: Math.pow };
+    default:
+      throw new Error(`Unknown module: ${moduleName}`);
+  }
+}
+```
+
+#### `isAsync?: boolean`
+
+Wraps the code in an async function, enabling top-level await.
+
+**Default:** `false`, but automatically set to `true` if `importFunction` is async
+
+**Note:** This adds overhead even if no await is used, so only enable when necessary.
 
 ## Related Functions
 
