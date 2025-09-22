@@ -1,12 +1,6 @@
 import * as acorn from "acorn";
 import * as escodegen from "escodegen";
 
-export interface ExportedValue {
-  declaration: any;
-  exported?: any;
-  spread?: boolean;
-}
-
 export interface RunOptions {
   // Pass to dependencies
   parseOptions?: Partial<acorn.Options>;
