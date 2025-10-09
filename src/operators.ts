@@ -1,5 +1,3 @@
-import { PassToDefaultBehavior } from "./errors";
-
 export const Py = {
   // 1. Unary Operators
   __pos__: Symbol.for("__pos__"),
@@ -289,20 +287,6 @@ export function $__(operator: any, arg: any) {
   }
 }
 
-export function tryCatchSeq(...fns: (() => any)[]) {
-  if (fns.length > 0) {
-    const [fn, ...rest] = fns;
-    try {
-      return fn();
-    } catch (e) {
-      if (e instanceof PassToDefaultBehavior && rest.length > 0) {
-        return tryCatchSeq(...rest);
-      }
-      throw e;
-    }
-  }
-}
-
 export function __$__(left: any, operator: any, right: any) {
   const sym = binaryOperatorsMap[operator];
 
@@ -313,14 +297,14 @@ export function __$__(left: any, operator: any, right: any) {
     [binaryShorthandImpl[left[sym]], left, right],
     [binaryShorthandImpl[right[opposites[sym]]], right, left],
     [binaryDefaultActions[sym], left, right],
-  ];
+  ].filter(([fn]) => typeof fn === "function");
 
-  return tryCatchSeq(
-    ...sequence.map(([fn, a, b]) => () => {
-      if (typeof fn === "function") {
-        return fn.call(a, b);
-      }
-      throw new PassToDefaultBehavior();
-    }),
-  );
+  if (sequence.length === 0) {
+    throw new Error(
+      `Operator ${operator} not implemented for types ${typeof left} and ${typeof right}`,
+    );
+  }
+
+  const [fn, a, b] = sequence[0];
+  return fn.call(a, b);
 }
