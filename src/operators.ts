@@ -175,6 +175,7 @@ export const unaryOperatorsMap: Record<string, symbol> = {
   "!": Py.__not__,
   "~": Py.__invert__,
   typeof: Py.__typeof__,
+  void: Py.__void__,
 };
 
 export const binaryOperatorsMap: Record<string, symbol> = {
