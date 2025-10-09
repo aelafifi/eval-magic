@@ -70,7 +70,6 @@ export function compile(
 }
 
 export function evaluate(
-  this: any,
   code: string,
   globals: Record<string, any> = {},
   options: RunOptions = {},

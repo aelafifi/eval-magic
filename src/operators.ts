@@ -202,6 +202,9 @@ export const binaryOperatorsMap: Record<string, symbol> = {
   instanceof: Py.__instanceof__,
   "&": Py.__bitwise_and__,
   "|": Py.__bitwise_or__,
+  "&&": Py.__and__,
+  "||": Py.__or__,
+  "??": Py.__nullish__,
 };
 
 const binaryShorthandImpl = {
@@ -314,12 +317,10 @@ export function __$__(left: any, operator: any, right: any) {
 
   return tryCatchSeq(
     ...sequence.map(([fn, a, b]) => () => {
-      return () => {
-        if (typeof fn === "function") {
-          return fn(a, b);
-        }
-        throw new PassToDefaultBehavior();
-      };
+      if (typeof fn === "function") {
+        return fn(a, b);
+      }
+      throw new PassToDefaultBehavior();
     }),
   );
 }
