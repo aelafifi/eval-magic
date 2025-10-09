@@ -2,3 +2,4 @@ docs/
 .github/
 .idea/
 coverage/
+src/

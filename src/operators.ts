@@ -213,6 +213,7 @@ const binaryShorthandImpl = {
   [Py.__lt__]: (left, right) => left[Py.__cmp__](right) < 0,
   [Py.__le__]: (left, right) => left[Py.__cmp__](right) <= 0,
 
+  // TODO: need to revise the opposite calls here
   [Py.__add__]: (left, right) =>
     left[Py.__arithmetic__](right, binaryDefaultActions[Py.__add__]),
   [Py.__radd__]: (left, right) =>
