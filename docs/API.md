@@ -357,55 +357,13 @@ try {
 }
 ```
 
-### Operator Overloading Errors
+### Fallback Sequence For Binary Operators
 
-When using operator overloading, eval-magic provides a special error type `PassToDefaultBehavior` that allows custom operator implementations to fall back to the next available implementation in the sequence.
-
-#### PassToDefaultBehavior
-
-The `PassToDefaultBehavior` error is used internally by the operator overloading system to implement a cascading fallback mechanism. When an operator method throws this error, the system automatically tries the next method in the predefined sequence until it finds a working implementation or falls back to JavaScript's default behavior.
-
-**Fallback sequence for binary operators:**
 1. Left operand's operator method (e.g., `left[Py.__add__]`)
 2. Right operand's reverse operator method (e.g., `right[Py.__radd__]`)
 3. Left operand's shorthand method (e.g., `left[Py.__arithmetic__]`)
 4. Right operand's reverse shorthand method (e.g., `right[Py.__arithmetic__]`)
 5. Default JavaScript behavior (e.g., `left + right`)
-
-```javascript
-import { evaluate, Py, PassToDefaultBehavior } from "eval-magic";
-
-class CustomNumber {
-  constructor(value) {
-    this.value = value;
-  }
-  
-  [Py.__add__](other) {
-    if (typeof other === "number") {
-      return new CustomNumber(this.value + other);
-    }
-    // Throw PassToDefaultBehavior to try the next method in sequence
-    throw new PassToDefaultBehavior();
-  }
-}
-
-const result = evaluate(
-  `
-  export const sum = a + b; // Will try a[__add__], then fall back to default
-  `,
-  {
-    a: new CustomNumber(5),
-    b: "hello" // This will trigger the fallback
-  },
-  { operatorOverloading: true }
-);
-
-// Since CustomNumber.__add__ throws PassToDefaultBehavior for string,
-// it falls back to JavaScript's default: "5hello"
-console.log(result.sum); // "5hello"
-```
-
-**Note:** You typically don't need to catch or handle `PassToDefaultBehavior` errors directly. They are handled automatically by the operator overloading system. Only throw this error from within custom operator methods when you want to delegate to the next implementation in the fallback sequence.
 
 ## Performance Considerations
 

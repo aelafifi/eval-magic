@@ -649,5 +649,3 @@ console.log((p1 * 2).toString());   // Point(2, 4)
 console.log((p1 >> p2));            // Angle between points
 console.log((p1 >>> p2));           // Distance between points
 ```
-
-**Note:** When implementing operator methods, you can throw a `PassToDefaultBehavior` error to let eval-magic fall back to the next available implementation in the sequence, ultimately falling back to JavaScript's default behavior if no custom method handles the operation.
