@@ -41,6 +41,7 @@ function preIncrement(id: acorn.Identifier, operator: string, state: any) {
  */
 function postIncrement(id: acorn.Identifier, operator: string, state: any) {
   state.binaryFnUsed = true;
+  state.opsFallbackUsed = true;
   return CallExpression(
     ArrowFunctionExpression(
       [],
@@ -54,6 +55,7 @@ function postIncrement(id: acorn.Identifier, operator: string, state: any) {
                 id,
                 "=",
                 CallExpression(Identifier(state.binaryFnName), [
+                  Identifier(state.opsFallbackVarName),
                   id,
                   Literal(operator),
                   Literal(1),
@@ -84,6 +86,7 @@ function updateAssign(
   state: any,
 ) {
   state.binaryFnUsed = true;
+  state.opsFallbackUsed = true;
   return CallExpression(
     ArrowFunctionExpression(
       [],
@@ -93,6 +96,7 @@ function updateAssign(
             id,
             "=",
             CallExpression(Identifier(state.binaryFnName), [
+              Identifier(state.opsFallbackVarName),
               id,
               Literal(operator),
               value,
@@ -118,8 +122,10 @@ export const UnaryExpression = (step: StepInfo, state: any) => {
   if (!hasOwnProp(unaryOperatorsMap, step._node.operator)) return;
 
   state.unaryFnUsed = true;
+  state.opsFallbackUsed = true;
   step.replaceWith(
     CallExpression(Identifier(state.unaryFnName), [
+      Identifier(state.opsFallbackVarName),
       Literal(step._node.operator),
       step._node.argument,
     ]),
@@ -137,8 +143,10 @@ export const BinaryExpression = (step: StepInfo, state: any) => {
   if (!hasOwnProp(binaryOperatorsMap, step._node.operator)) return;
 
   state.binaryFnUsed = true;
+  state.opsFallbackUsed = true;
   step.replaceWith(
     CallExpression(Identifier(state.binaryFnName), [
+      Identifier(state.opsFallbackVarName),
       step._node.left,
       Literal(step._node.operator),
       step._node.right,

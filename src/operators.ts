@@ -278,25 +278,45 @@ const binaryShorthandImpl = {
     left[Py.__logical__](right, binaryDefaultActions[Py.__rnullish__]),
 };
 
-export function $__(operator: any, arg: any) {
+export function $__(
+  opsFallback: Record<symbol, Function>,
+  operator: any,
+  arg: any,
+) {
   const sym = unaryOperatorsMap[operator];
-  try {
-    const fn = arg[sym];
-    return fn.call(arg);
-  } catch (e) {
-    return unaryDefaultActions[sym](arg);
+
+  const sequence = [
+    // fn, ...args
+    [arg?.[sym], arg],
+    [opsFallback?.[sym], null, arg],
+    [unaryDefaultActions[sym], null, arg],
+  ].filter(([fn]) => typeof fn === "function");
+
+  if (sequence.length === 0) {
+    throw new Error(
+      `Operator ${operator} not implemented for type ${typeof arg}`,
+    );
   }
+
+  const [fn, ...args] = sequence[0];
+  return fn.call(...args);
 }
 
-export function __$__(left: any, operator: any, right: any) {
+export function __$__(
+  opsFallback: Record<symbol, Function>,
+  left: any,
+  operator: any,
+  right: any,
+) {
   const sym = binaryOperatorsMap[operator];
 
   const sequence = [
-    // fn, a, b
-    [left[sym], left, right],
-    [right[opposites[sym]], right, left],
-    [binaryShorthandImpl[left[sym]], null, left, right],
-    [binaryShorthandImpl[right[opposites[sym]]], null, right, left],
+    // fn, ...args
+    [left?.[sym], left, right],
+    [right?.[opposites[sym]], right, left],
+    [binaryShorthandImpl[left?.[sym]], null, left, right],
+    [binaryShorthandImpl[right?.[opposites[sym]]], null, right, left],
+    [opsFallback?.[sym], null, left, right],
     [binaryDefaultActions[sym], null, left, right],
   ].filter(([fn]) => typeof fn === "function");
 

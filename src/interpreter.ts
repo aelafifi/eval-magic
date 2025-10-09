@@ -19,6 +19,7 @@ export function compile(
     returns: "exports",
     operatorOverloading: true,
     isAsync: false,
+    opsFallback: {},
     ...options,
   };
 
@@ -45,6 +46,9 @@ export function compile(
     ),
     ...(state.unaryFnUsed ? [[state.unaryFnName, $__]] : []),
     ...(state.binaryFnUsed ? [[state.binaryFnName, __$__]] : []),
+    ...(state.opsFallbackUsed
+      ? [[state.opsFallbackVarName, options.opsFallback]]
+      : []),
     ...(state.importFnUsed
       ? [[state.importFnName, options.importFunction]]
       : []),

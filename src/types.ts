@@ -11,6 +11,7 @@ export interface RunOptions {
   operatorOverloading?: boolean;
   importFunction?: (source: string) => Object;
   isAsync?: boolean;
+  opsFallback?: Record<symbol, Function>;
 }
 
 export interface CompiledCode {
