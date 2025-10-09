@@ -295,9 +295,9 @@ export function __$__(left: any, operator: any, right: any) {
     // fn, a, b
     [left[sym], left, right],
     [right[opposites[sym]], right, left],
-    [binaryShorthandImpl[left[sym]], left, right],
-    [binaryShorthandImpl[right[opposites[sym]]], right, left],
-    [binaryDefaultActions[sym], left, right],
+    [binaryShorthandImpl[left[sym]], null, left, right],
+    [binaryShorthandImpl[right[opposites[sym]]], null, right, left],
+    [binaryDefaultActions[sym], null, left, right],
   ].filter(([fn]) => typeof fn === "function");
 
   if (sequence.length === 0) {
@@ -306,6 +306,6 @@ export function __$__(left: any, operator: any, right: any) {
     );
   }
 
-  const [fn, a, b] = sequence[0];
-  return fn.call(a, b);
+  const [fn, ...args] = sequence[0];
+  return fn.call(...args);
 }
