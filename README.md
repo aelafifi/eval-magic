@@ -32,7 +32,7 @@ console.log(result); // { sum: 30 }
 ### Operator Overloading
 
 ```javascript
-import { compile, Py } from "eval-magic";
+import { compile, Op } from "eval-magic";
 
 class Point {
     constructor(x, y) {
@@ -40,7 +40,7 @@ class Point {
         this.y = y;
     }
 
-    [Py.__add__](other) {
+    [Op.__add__](other) {
         return new Point(this.x + other.x, this.y + other.y);
     }
 }

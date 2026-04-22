@@ -88,7 +88,7 @@ Configuration options for parsing, transforming, and executing the code.
   
 - **`operatorOverloading?: boolean`**
   
-  Enables Python-like operator overloading via magic methods using the `Py` symbols.
+  Enables Python-like operator overloading via magic methods using the `Op` symbols.
   
   **Default:** `true`
 
@@ -181,7 +181,7 @@ console.log(compiled.run()); // { result: 110 }
 ### Operator Overloading
 
 ```javascript
-import { compile, Py } from "eval-magic";
+import { compile, Op } from "eval-magic";
 
 class Point {
   constructor(x, y) {
@@ -189,7 +189,7 @@ class Point {
     this.y = y;
   }
 
-  [Py.__add__](other) {
+  [Op.__add__](other) {
     return new Point(this.x + other.x, this.y + other.y);
   }
 
@@ -359,10 +359,10 @@ try {
 
 ### Fallback Sequence For Binary Operators
 
-1. Left operand's operator method (e.g., `left[Py.__add__]`)
-2. Right operand's reverse operator method (e.g., `right[Py.__radd__]`)
-3. Left operand's shorthand method (e.g., `left[Py.__arithmetic__]`)
-4. Right operand's reverse shorthand method (e.g., `right[Py.__arithmetic__]`)
+1. Left operand's operator method (e.g., `left[Op.__add__]`)
+2. Right operand's reverse operator method (e.g., `right[Op.__radd__]`)
+3. Left operand's shorthand method (e.g., `left[Op.__arithmetic__]`)
+4. Right operand's reverse shorthand method (e.g., `right[Op.__arithmetic__]`)
 5. Default JavaScript behavior (e.g., `left + right`)
 
 ## Performance Considerations
@@ -527,7 +527,7 @@ Enables Python-like operator overloading via magic methods.
 
 **Default:** `true`
 
-When enabled, operators like `+`, `-`, `*` are transformed to check for magic methods like `Py.__add__`, `Py.__sub__`, etc.
+When enabled, operators like `+`, `-`, `*` are transformed to check for magic methods like `Op.__add__`, `Op.__sub__`, etc.
 
 #### `importFunction?: (source: string) => Object | Promise<Object>`
 
@@ -562,4 +562,4 @@ Wraps the code in an async function, enabling top-level await.
 
 ## Related Functions
 
-- **[`Py` operators](./OPERATORS.md)**: Magic method symbols for operator overloading
+- **[`Op` operators](./OPERATORS.md)**: Magic method symbols for operator overloading

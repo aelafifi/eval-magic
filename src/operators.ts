@@ -1,4 +1,4 @@
-export const Py = {
+export const Op = {
   // 1. Unary Operators
   __pos__: Symbol.for("__pos__"),
   __neg__: Symbol.for("__neg__"),
@@ -62,180 +62,180 @@ export const Py = {
 
 const unaryDefaultActions: Record<symbol, (a: any) => any> = {
   // Unary Operators
-  [Py.__pos__]: (a: any) => +a,
-  [Py.__neg__]: (a: any) => -a,
-  [Py.__not__]: (a: any) => !a,
-  [Py.__invert__]: (a: any) => ~a,
-  [Py.__typeof__]: (a: any) => typeof a,
-  [Py.__void__]: (a: any) => void a,
-  /* [Py.__delete__]: (a: any) => delete a,  // Invalid operation */
+  [Op.__pos__]: (a: any) => +a,
+  [Op.__neg__]: (a: any) => -a,
+  [Op.__not__]: (a: any) => !a,
+  [Op.__invert__]: (a: any) => ~a,
+  [Op.__typeof__]: (a: any) => typeof a,
+  [Op.__void__]: (a: any) => void a,
+  /* [Op.__delete__]: (a: any) => delete a,  // Invalid operation */
 };
 
 const binaryDefaultActions: Record<symbol, (a: any, b: any) => any> = {
   // Binary Operators
-  [Py.__add__]: (a: any, b: any) => a + b,
-  [Py.__sub__]: (a: any, b: any) => a - b,
-  [Py.__mul__]: (a: any, b: any) => a * b,
-  [Py.__div__]: (a: any, b: any) => a / b,
-  [Py.__mod__]: (a: any, b: any) => a % b,
-  [Py.__pow__]: (a: any, b: any) => a ** b,
-  [Py.__lshift__]: (a: any, b: any) => {
+  [Op.__add__]: (a: any, b: any) => a + b,
+  [Op.__sub__]: (a: any, b: any) => a - b,
+  [Op.__mul__]: (a: any, b: any) => a * b,
+  [Op.__div__]: (a: any, b: any) => a / b,
+  [Op.__mod__]: (a: any, b: any) => a % b,
+  [Op.__pow__]: (a: any, b: any) => a ** b,
+  [Op.__lshift__]: (a: any, b: any) => {
     return a << b;
   },
-  [Py.__rshift__]: (a: any, b: any) => a >> b,
-  [Py.__urshift__]: (a: any, b: any) => a >>> b,
-  [Py.__xor__]: (a: any, b: any) => a ^ b,
-  [Py.__eq__]: (a: any, b: any) => a == b,
-  [Py.__ne__]: (a: any, b: any) => a != b,
-  [Py.__lt__]: (a: any, b: any) => a < b,
-  [Py.__le__]: (a: any, b: any) => a <= b,
-  [Py.__gt__]: (a: any, b: any) => a > b,
-  [Py.__ge__]: (a: any, b: any) => a >= b,
-  [Py.__seq__]: (a: any, b: any) => a === b, // Strict equality (===)
-  [Py.__sne__]: (a: any, b: any) => a !== b, // Strict inequality (!==)
-  [Py.__in__]: (a: any, b: any) => a in b,
-  [Py.__instanceof__]: (a: any, b: any) => a instanceof b,
-  [Py.__bitwise_and__]: (a: any, b: any) => a & b,
-  [Py.__bitwise_or__]: (a: any, b: any) => a | b,
+  [Op.__rshift__]: (a: any, b: any) => a >> b,
+  [Op.__urshift__]: (a: any, b: any) => a >>> b,
+  [Op.__xor__]: (a: any, b: any) => a ^ b,
+  [Op.__eq__]: (a: any, b: any) => a == b,
+  [Op.__ne__]: (a: any, b: any) => a != b,
+  [Op.__lt__]: (a: any, b: any) => a < b,
+  [Op.__le__]: (a: any, b: any) => a <= b,
+  [Op.__gt__]: (a: any, b: any) => a > b,
+  [Op.__ge__]: (a: any, b: any) => a >= b,
+  [Op.__seq__]: (a: any, b: any) => a === b, // Strict equality (===)
+  [Op.__sne__]: (a: any, b: any) => a !== b, // Strict inequality (!==)
+  [Op.__in__]: (a: any, b: any) => a in b,
+  [Op.__instanceof__]: (a: any, b: any) => a instanceof b,
+  [Op.__bitwise_and__]: (a: any, b: any) => a & b,
+  [Op.__bitwise_or__]: (a: any, b: any) => a | b,
 
   // Reversed Binary Operators
-  [Py.__radd__]: (a: any, b: any) => b + a,
-  [Py.__rsub__]: (a: any, b: any) => b - a,
-  [Py.__rmul__]: (a: any, b: any) => b * a,
-  [Py.__rdiv__]: (a: any, b: any) => b / a,
-  [Py.__rmod__]: (a: any, b: any) => b % a,
-  [Py.__rpow__]: (a: any, b: any) => b ** a,
-  [Py.__rlshift__]: (a: any, b: any) => {
+  [Op.__radd__]: (a: any, b: any) => b + a,
+  [Op.__rsub__]: (a: any, b: any) => b - a,
+  [Op.__rmul__]: (a: any, b: any) => b * a,
+  [Op.__rdiv__]: (a: any, b: any) => b / a,
+  [Op.__rmod__]: (a: any, b: any) => b % a,
+  [Op.__rpow__]: (a: any, b: any) => b ** a,
+  [Op.__rlshift__]: (a: any, b: any) => {
     return b << a;
   },
-  [Py.__rrshift__]: (a: any, b: any) => b >> a,
-  [Py.__rurshift__]: (a: any, b: any) => b >>> a,
-  [Py.__rxor__]: (a: any, b: any) => b ^ a,
-  [Py.__rin__]: (a: any, b: any) => b in a,
-  [Py.__rinstanceof__]: (a: any, b: any) => b instanceof a,
-  [Py.__rbitwise_and__]: (a: any, b: any) => b & a,
-  [Py.__rbitwise_or__]: (a: any, b: any) => b | a,
+  [Op.__rrshift__]: (a: any, b: any) => b >> a,
+  [Op.__rurshift__]: (a: any, b: any) => b >>> a,
+  [Op.__rxor__]: (a: any, b: any) => b ^ a,
+  [Op.__rin__]: (a: any, b: any) => b in a,
+  [Op.__rinstanceof__]: (a: any, b: any) => b instanceof a,
+  [Op.__rbitwise_and__]: (a: any, b: any) => b & a,
+  [Op.__rbitwise_or__]: (a: any, b: any) => b | a,
 
 };
 
 const opposites = {
   // Binary Operators
-  [Py.__add__]: Py.__radd__,
-  [Py.__sub__]: Py.__rsub__,
-  [Py.__mul__]: Py.__rmul__,
-  [Py.__div__]: Py.__rdiv__,
-  [Py.__mod__]: Py.__rmod__,
-  [Py.__pow__]: Py.__rpow__,
-  [Py.__lshift__]: Py.__rlshift__,
-  [Py.__rshift__]: Py.__rrshift__,
-  [Py.__urshift__]: Py.__rurshift__,
-  [Py.__xor__]: Py.__rxor__,
-  [Py.__eq__]: Py.__eq__,
-  [Py.__ne__]: Py.__ne__,
-  [Py.__lt__]: Py.__gt__,
-  [Py.__le__]: Py.__ge__,
-  [Py.__gt__]: Py.__lt__,
-  [Py.__ge__]: Py.__le__,
-  [Py.__seq__]: Py.__seq__,
-  [Py.__sne__]: Py.__sne__,
-  [Py.__in__]: Py.__rin__,
-  [Py.__instanceof__]: Py.__rinstanceof__,
-  [Py.__bitwise_and__]: Py.__rbitwise_and__,
-  [Py.__bitwise_or__]: Py.__rbitwise_or__,
+  [Op.__add__]: Op.__radd__,
+  [Op.__sub__]: Op.__rsub__,
+  [Op.__mul__]: Op.__rmul__,
+  [Op.__div__]: Op.__rdiv__,
+  [Op.__mod__]: Op.__rmod__,
+  [Op.__pow__]: Op.__rpow__,
+  [Op.__lshift__]: Op.__rlshift__,
+  [Op.__rshift__]: Op.__rrshift__,
+  [Op.__urshift__]: Op.__rurshift__,
+  [Op.__xor__]: Op.__rxor__,
+  [Op.__eq__]: Op.__eq__,
+  [Op.__ne__]: Op.__ne__,
+  [Op.__lt__]: Op.__gt__,
+  [Op.__le__]: Op.__ge__,
+  [Op.__gt__]: Op.__lt__,
+  [Op.__ge__]: Op.__le__,
+  [Op.__seq__]: Op.__seq__,
+  [Op.__sne__]: Op.__sne__,
+  [Op.__in__]: Op.__rin__,
+  [Op.__instanceof__]: Op.__rinstanceof__,
+  [Op.__bitwise_and__]: Op.__rbitwise_and__,
+  [Op.__bitwise_or__]: Op.__rbitwise_or__,
 };
 
 export const unaryOperatorsMap: Record<string, symbol> = {
-  "+": Py.__pos__,
-  "-": Py.__neg__,
-  "!": Py.__not__,
-  "~": Py.__invert__,
-  typeof: Py.__typeof__,
-  void: Py.__void__,
+  "+": Op.__pos__,
+  "-": Op.__neg__,
+  "!": Op.__not__,
+  "~": Op.__invert__,
+  typeof: Op.__typeof__,
+  void: Op.__void__,
 };
 
 export const binaryOperatorsMap: Record<string, symbol> = {
-  "+": Py.__add__,
-  "-": Py.__sub__,
-  "*": Py.__mul__,
-  "/": Py.__div__,
-  "%": Py.__mod__,
-  "**": Py.__pow__,
-  "<<": Py.__lshift__,
-  ">>": Py.__rshift__,
-  ">>>": Py.__urshift__,
-  "^": Py.__xor__,
-  "==": Py.__eq__,
-  "!=": Py.__ne__,
-  "===": Py.__seq__,
-  "!==": Py.__sne__,
-  "<": Py.__lt__,
-  "<=": Py.__le__,
-  ">": Py.__gt__,
-  ">=": Py.__ge__,
-  in: Py.__in__,
-  instanceof: Py.__instanceof__,
-  "&": Py.__bitwise_and__,
-  "|": Py.__bitwise_or__,
+  "+": Op.__add__,
+  "-": Op.__sub__,
+  "*": Op.__mul__,
+  "/": Op.__div__,
+  "%": Op.__mod__,
+  "**": Op.__pow__,
+  "<<": Op.__lshift__,
+  ">>": Op.__rshift__,
+  ">>>": Op.__urshift__,
+  "^": Op.__xor__,
+  "==": Op.__eq__,
+  "!=": Op.__ne__,
+  "===": Op.__seq__,
+  "!==": Op.__sne__,
+  "<": Op.__lt__,
+  "<=": Op.__le__,
+  ">": Op.__gt__,
+  ">=": Op.__ge__,
+  in: Op.__in__,
+  instanceof: Op.__instanceof__,
+  "&": Op.__bitwise_and__,
+  "|": Op.__bitwise_or__,
 };
 
 const binaryShorthandImpl = {
-  [Py.__eq__]: (left, right) => left[Py.__cmp__](right) === 0,
-  [Py.__ne__]: (left, right) => left[Py.__cmp__](right) !== 0,
-  [Py.__gt__]: (left, right) => left[Py.__cmp__](right) > 0,
-  [Py.__ge__]: (left, right) => left[Py.__cmp__](right) >= 0,
-  [Py.__lt__]: (left, right) => left[Py.__cmp__](right) < 0,
-  [Py.__le__]: (left, right) => left[Py.__cmp__](right) <= 0,
+  [Op.__eq__]: (left, right) => left[Op.__cmp__](right) === 0,
+  [Op.__ne__]: (left, right) => left[Op.__cmp__](right) !== 0,
+  [Op.__gt__]: (left, right) => left[Op.__cmp__](right) > 0,
+  [Op.__ge__]: (left, right) => left[Op.__cmp__](right) >= 0,
+  [Op.__lt__]: (left, right) => left[Op.__cmp__](right) < 0,
+  [Op.__le__]: (left, right) => left[Op.__cmp__](right) <= 0,
 
   // TODO: need to revise the opposite calls here
-  [Py.__add__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__add__]),
-  [Py.__radd__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__radd__]),
-  [Py.__sub__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__sub__]),
-  [Py.__rsub__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rsub__]),
-  [Py.__mul__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__mul__]),
-  [Py.__rmul__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rmul__]),
-  [Py.__div__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__div__]),
-  [Py.__rdiv__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rdiv__]),
-  [Py.__mod__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__mod__]),
-  [Py.__rmod__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rmod__]),
-  [Py.__pow__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__pow__]),
-  [Py.__rpow__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rpow__]),
-  [Py.__lshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__lshift__]),
-  [Py.__rlshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rlshift__]),
-  [Py.__rshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rshift__]),
-  [Py.__rrshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rrshift__]),
-  [Py.__urshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__urshift__]),
-  [Py.__rurshift__]: (left, right) =>
-    left[Py.__arithmetic__](right, binaryDefaultActions[Py.__rurshift__]),
+  [Op.__add__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__add__]),
+  [Op.__radd__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__radd__]),
+  [Op.__sub__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__sub__]),
+  [Op.__rsub__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rsub__]),
+  [Op.__mul__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__mul__]),
+  [Op.__rmul__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rmul__]),
+  [Op.__div__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__div__]),
+  [Op.__rdiv__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rdiv__]),
+  [Op.__mod__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__mod__]),
+  [Op.__rmod__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rmod__]),
+  [Op.__pow__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__pow__]),
+  [Op.__rpow__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rpow__]),
+  [Op.__lshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__lshift__]),
+  [Op.__rlshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rlshift__]),
+  [Op.__rshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rshift__]),
+  [Op.__rrshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rrshift__]),
+  [Op.__urshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__urshift__]),
+  [Op.__rurshift__]: (left, right) =>
+    left[Op.__arithmetic__](right, binaryDefaultActions[Op.__rurshift__]),
 
-  [Py.__xor__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__xor__]),
-  [Py.__rxor__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__rxor__]),
-  [Py.__bitwise_and__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__bitwise_and__]),
-  [Py.__rbitwise_and__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__rbitwise_and__]),
-  [Py.__bitwise_or__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__bitwise_or__]),
-  [Py.__rbitwise_or__]: (left, right) =>
-    left[Py.__bitwise__](right, binaryDefaultActions[Py.__rbitwise_or__]),
+  [Op.__xor__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__xor__]),
+  [Op.__rxor__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__rxor__]),
+  [Op.__bitwise_and__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__bitwise_and__]),
+  [Op.__rbitwise_and__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__rbitwise_and__]),
+  [Op.__bitwise_or__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__bitwise_or__]),
+  [Op.__rbitwise_or__]: (left, right) =>
+    left[Op.__bitwise__](right, binaryDefaultActions[Op.__rbitwise_or__]),
 };
 
 export function $__(

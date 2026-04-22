@@ -1,6 +1,6 @@
 # Magic Method Operators Reference
 
-This document provides comprehensive documentation for all the `Py.__magic_symbols__` available in eval-magic, inspired by Python's magic methods for operator overloading.
+This document provides comprehensive documentation for all the `Op.__magic_symbols__` available in eval-magic, inspired by Python's magic methods for operator overloading.
 
 ## Table of Contents
 
@@ -33,14 +33,15 @@ Magic methods in eval-magic allow you to define custom behavior for operators wh
 **Default behavior:** `-a`
 
 **Example:**
+
 ```javascript
 class Point {
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    
-    [Py.__neg__]() {
+
+    [Op.__neg__]() {
         return new Point(-this.x, -this.y);
     }
 }
@@ -83,23 +84,24 @@ const p2 = -p1; // Point(-3, -4)
 **Default behavior:** `a + b`
 
 **Example:**
+
 ```javascript
 class Vector {
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    
-    [Py.__add__](other) {
+
+    [Op.__add__](other) {
         if (other instanceof Vector) {
             return new Vector(this.x + other.x, this.y + other.y);
         }
         // Handle scalar addition
         return new Vector(this.x + other, this.y + other);
     }
-    
-    [Py.__radd__](other) {
-        return this[Py.__add__](other);
+
+    [Op.__radd__](other) {
+        return this[Op.__add__](other);
     }
 }
 
@@ -209,20 +211,21 @@ const v4 = 5 + v1;  // Vector(6, 7) - uses __radd__
 **Default behavior:** `a !== b`
 
 **Example:**
+
 ```javascript
 class Person {
     constructor(name, age) {
         this.name = name;
         this.age = age;
     }
-    
-    [Py.__eq__](other) {
-        return other instanceof Person && 
-               this.name === other.name && 
-               this.age === other.age;
+
+    [Op.__eq__](other) {
+        return other instanceof Person &&
+            this.name === other.name &&
+            this.age === other.age;
     }
-    
-    [Py.__lt__](other) {
+
+    [Op.__lt__](other) {
         return other instanceof Person && this.age < other.age;
     }
 }
@@ -258,13 +261,14 @@ console.log(person1 == person2); // false
 **Default behavior:** `a in b`
 
 **Example:**
+
 ```javascript
 class CustomContainer {
     constructor(items) {
         this.items = new Set(items);
     }
-    
-    [Py.__rin__](item) {
+
+    [Op.__rin__](item) {
         return this.items.has(item);
     }
 }
@@ -312,7 +316,7 @@ Instead of implementing individual arithmetic methods (`__add__`, `__sub__`, `__
 
 **Example:**
 ```javascript
-import { Py } from "eval-magic";
+import { Op } from "eval-magic";
 
 class Point {
     constructor(x, y) {
@@ -321,7 +325,7 @@ class Point {
     }
     
     // Single method to handle all arithmetic operations
-    [Py.__arithmetic__](other, defaultAction) {
+    [Op.__arithmetic__](other, defaultAction) {
         // Convert other to Point if it's not already
         const otherPoint = this.pointify(other);
         
@@ -363,8 +367,8 @@ console.log((p1 / [2, 4]).toString()); // Point(5, 5)
 ```
 
 **How it works:**
-- When you use `p1 + p2`, eval-magic calls `p1[Py.__arithmetic__](p2, defaultAddAction)`
-- When you use `p1 * 2`, eval-magic calls `p1[Py.__arithmetic__](2, defaultMulAction)`
+- When you use `p1 + p2`, eval-magic calls `p1[Op.__arithmetic__](p2, defaultAddAction)`
+- When you use `p1 * 2`, eval-magic calls `p1[Op.__arithmetic__](2, defaultMulAction)`
 - The `defaultAction` parameter contains the native JavaScript operation behavior for primitives
 - Your `__arithmetic__` method applies this operation to the individual components of your data structure
 
@@ -381,13 +385,14 @@ console.log((p1 / [2, 4]).toString()); // Point(5, 5)
 **Usage:** Single method to handle all comparison operators
 
 **Example:**
+
 ```javascript
 class Temperature {
     constructor(celsius) {
         this.celsius = celsius;
     }
-    
-    [Py.__cmp__](other) {
+
+    [Op.__cmp__](other) {
         if (!(other instanceof Temperature)) {
             other = new Temperature(other);
         }
@@ -408,10 +413,10 @@ console.log(temp1 > temp2);  // false (uses __cmp__)
 
 When an operator is used, eval-magic tries to resolve it in this order:
 
-1. **Direct method:** `left[Py.__op__](right)`
-2. **Reversed method:** `right[Py.__rop__](left)`
-3. **Shorthand method:** `left[Py.__shorthand__](right, defaultAction)`
-4. **Reversed shorthand:** `right[Py.__shorthand__](left, defaultAction)`
+1. **Direct method:** `left[Op.__op__](right)`
+2. **Reversed method:** `right[Op.__rop__](left)`
+3. **Shorthand method:** `left[Op.__shorthand__](right, defaultAction)`
+4. **Reversed shorthand:** `right[Op.__shorthand__](left, defaultAction)`
 5. **Default behavior:** Native JavaScript operator
 
 ### Best Practices
@@ -425,7 +430,7 @@ When an operator is used, eval-magic tries to resolve it in this order:
 ### Example: Complete Numeric Class
 
 ```javascript
-import { Py } from "eval-magic";
+import { Op } from "eval-magic";
 
 class Complex {
     constructor(real, imag = 0) {
@@ -433,7 +438,7 @@ class Complex {
         this.imag = imag;
     }
     
-    [Py.__add__](other) {
+    [Op.__add__](other) {
         if (typeof other === 'number') {
             return new Complex(this.real + other, this.imag);
         }
@@ -443,11 +448,11 @@ class Complex {
         throw new TypeError('Unsupported operand type');
     }
     
-    [Py.__radd__](other) {
-        return this[Py.__add__](other);
+    [Op.__radd__](other) {
+        return this[Op.__add__](other);
     }
     
-    [Py.__mul__](other) {
+    [Op.__mul__](other) {
         if (typeof other === 'number') {
             return new Complex(this.real * other, this.imag * other);
         }
@@ -460,11 +465,11 @@ class Complex {
         throw new TypeError('Unsupported operand type');
     }
     
-    [Py.__rmul__](other) {
-        return this[Py.__mul__](other);
+    [Op.__rmul__](other) {
+        return this[Op.__mul__](other);
     }
     
-    [Py.__eq__](other) {
+    [Op.__eq__](other) {
         if (typeof other === 'number') {
             return this.real === other && this.imag === 0;
         }
@@ -495,7 +500,7 @@ console.log(c1 == c1);             // true
 Here's a complete example showing how to implement a Point class with extensive operator overloading:
 
 ```javascript
-import { Py } from "eval-magic";
+import { Op } from "eval-magic";
 
 class Point {
     constructor(x, y) {
@@ -528,86 +533,86 @@ class Point {
         throw new TypeError("Cannot convert to Point: " + value);
     }
 
-    [Py.__add__](other) {
+    [Op.__add__](other) {
         // Allow adding any Point-like object or a number
         // Usage: p1 + p2, p1 + [x, y], p1 + {x: x, y: y}, p1 + number
         other_p = this.pointify(other);
         return new Point(this.x + other_p.x, this.y + other_p.y);
     }
 
-    [Py.__radd__](other) {
+    [Op.__radd__](other) {
         // Allow adding an array [x, y] to Point
         // Usage: [x, y] + p1
-        return this[Py.__add__](other);
+        return this[Op.__add__](other);
     }
     
-    [Py.__sub__](other) {
+    [Op.__sub__](other) {
         // Allow subtracting any Point-like object or a number
         other_p = this.pointify(other);
         return new Point(this.x - other_p.x, this.y - other_p.y);
     }
     
-    [Py.__rsub__](other) {
+    [Op.__rsub__](other) {
         // Allow subtracting Point from an array [x, y]
         // Usage: [x, y] - p1
         other_p = this.pointify(other);
-        return other_p[Py.__sub__](this);
+        return other_p[Op.__sub__](this);
     }
     
-    [Py.__mul__](other) {
+    [Op.__mul__](other) {
         // Allow multiplying by any Point-like object or a number
         other_p = this.pointify(other);
         return new Point(this.x * other_p.x, this.y * other_p.y);
     }
     
-    [Py.__rmul__](other) {
+    [Op.__rmul__](other) {
         // Allow multiplying an array [x, y] by Point
-        return this[Py.__mul__](other);
+        return this[Op.__mul__](other);
     }
     
-    [Py.__div__](other) {
+    [Op.__div__](other) {
         // Allow dividing by any Point-like object or a number
         other_p = this.pointify(other);
         return new Point(this.x / other_p.x, this.y / other_p.y);
     }
     
-    [Py.__rdiv__](other) {
+    [Op.__rdiv__](other) {
         // Allow dividing an array [x, y] by Point
         other_p = this.pointify(other);
-        return other_p[Py.__div__](this);
+        return other_p[Op.__div__](this);
     }
     
-    [Py.__mod__](other) {
+    [Op.__mod__](other) {
         // Allow modulus by any Point-like object or a number
         other_p = this.pointify(other);
         return new Point(this.x % other_p.x, this.y % other_p.y);
     }
     
-    [Py.__rmod__](other) {
+    [Op.__rmod__](other) {
         // Allow modulus of an array [x, y] by Point
         other_p = this.pointify(other);
-        return other_p[Py.__mod__](this);
+        return other_p[Op.__mod__](this);
     }
     
-    [Py.__pow__](other) {
+    [Op.__pow__](other) {
         // Allow power by any Point-like object or a number
         other_p = this.pointify(other);
         return new Point(this.x ** other_p.x, this.y ** other_p.y);
     }
     
-    [Py.__rpow__](other) {
+    [Op.__rpow__](other) {
         // Allow power of an array [x, y] by Point
         other_p = this.pointify(other);
-        return other_p[Py.__pow__](this);
+        return other_p[Op.__pow__](this);
     }
     
-    [Py.__neg__]() {
+    [Op.__neg__]() {
         // Negate the point
         // Usage: -p1
         return new Point(-this.x, -this.y);
     }
 
-    [Py.__rshift__](other) {
+    [Op.__rshift__](other) {
         // Get angle between two points
         // Usage: p1 >> p2
         if (other instanceof Point) {
@@ -618,13 +623,13 @@ class Point {
         throw new TypeError("Unsupported operand type(s) for >>: 'Point' and '" + typeof other + "'");
     }
 
-    [Py.__lshift__](other) {
+    [Op.__lshift__](other) {
         // Get angle between two points (in the opposite direction)
         // Usage: p1 << p2
-        return other[Py.__rshift__](this);
+        return other[Op.__rshift__](this);
     }
 
-    [Py.__urshift__](other) {
+    [Op.__urshift__](other) {
         // Get distance between two points
         // Usage: p1 >>> p2
         if (other instanceof Point) {
