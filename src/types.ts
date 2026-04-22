@@ -6,7 +6,7 @@ export interface RunOptions {
   parseOptions?: Partial<acorn.Options>;
   codegenOptions?: escodegen.GenerateOptions;
 
-  // ExecuteJS options
+  // compiler options
   returns?: "exports" | "return";
   operatorOverloading?: boolean;
   importFunction?: (source: string) => Object;
@@ -19,5 +19,8 @@ export interface CompiledCode {
   genCode: string;
   fn: Function;
   args: any[];
+  argKeys: string[];
   run: () => any;
+
+  [key: string]: any;
 }

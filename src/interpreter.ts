@@ -68,8 +68,12 @@ export function compile(
     origCode: code,
     genCode,
     fn,
+    argKeys: keys,
     args: values,
     run: () => fn.call(null, ...values),
+    parseTree,
+    transformer,
+    state,
   };
 }
 
