@@ -39,12 +39,6 @@ export const Py = {
   __sne__: Symbol.for("__sne__"), // Strict inequality (!==)
   __cmp__: Symbol.for("__cmp__"), // Custom comparison shorthand
 
-  // 2.4. Logical Operators
-  __and__: Symbol.for("__and__"),
-  __or__: Symbol.for("__or__"),
-  __nullish__: Symbol.for("__nullish__"),
-  __logical__: Symbol.for("__logical__"), // Custom logical shorthand
-
   // 2.5. Other Operators
   __in__: Symbol.for("__in__"),
   __instanceof__: Symbol.for("__instanceof__"),
@@ -64,11 +58,6 @@ export const Py = {
   __rinstanceof__: Symbol.for("__rinstanceof__"),
   __rbitwise_and__: Symbol.for("__rbitwise_and__"),
   __rbitwise_or__: Symbol.for("__rbitwise_or__"),
-
-  // Reversed Logical Operators
-  __rand__: Symbol.for("__rand__"),
-  __ror__: Symbol.for("__ror__"),
-  __rnullish__: Symbol.for("__rnullish__"),
 };
 
 const unaryDefaultActions: Record<symbol, (a: any) => any> = {
@@ -109,11 +98,6 @@ const binaryDefaultActions: Record<symbol, (a: any, b: any) => any> = {
   [Py.__bitwise_and__]: (a: any, b: any) => a & b,
   [Py.__bitwise_or__]: (a: any, b: any) => a | b,
 
-  // Logical Operators
-  [Py.__and__]: (a: any, b: any) => a && b,
-  [Py.__or__]: (a: any, b: any) => a || b,
-  [Py.__nullish__]: (a: any, b: any) => a ?? b,
-
   // Reversed Binary Operators
   [Py.__radd__]: (a: any, b: any) => b + a,
   [Py.__rsub__]: (a: any, b: any) => b - a,
@@ -132,10 +116,6 @@ const binaryDefaultActions: Record<symbol, (a: any, b: any) => any> = {
   [Py.__rbitwise_and__]: (a: any, b: any) => b & a,
   [Py.__rbitwise_or__]: (a: any, b: any) => b | a,
 
-  // Reversed Logical Operators
-  [Py.__rand__]: (a: any, b: any) => b && a,
-  [Py.__ror__]: (a: any, b: any) => b || a,
-  [Py.__rnullish__]: (a: any, b: any) => b ?? a,
 };
 
 const opposites = {
@@ -162,11 +142,6 @@ const opposites = {
   [Py.__instanceof__]: Py.__rinstanceof__,
   [Py.__bitwise_and__]: Py.__rbitwise_and__,
   [Py.__bitwise_or__]: Py.__rbitwise_or__,
-
-  // Logical Operators
-  [Py.__and__]: Py.__rand__,
-  [Py.__or__]: Py.__ror__,
-  [Py.__nullish__]: Py.__rnullish__,
 };
 
 export const unaryOperatorsMap: Record<string, symbol> = {
@@ -201,9 +176,6 @@ export const binaryOperatorsMap: Record<string, symbol> = {
   instanceof: Py.__instanceof__,
   "&": Py.__bitwise_and__,
   "|": Py.__bitwise_or__,
-  "&&": Py.__and__,
-  "||": Py.__or__,
-  "??": Py.__nullish__,
 };
 
 const binaryShorthandImpl = {
@@ -264,19 +236,6 @@ const binaryShorthandImpl = {
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__bitwise_or__]),
   [Py.__rbitwise_or__]: (left, right) =>
     left[Py.__bitwise__](right, binaryDefaultActions[Py.__rbitwise_or__]),
-
-  [Py.__and__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__and__]),
-  [Py.__rand__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__rand__]),
-  [Py.__or__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__or__]),
-  [Py.__ror__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__ror__]),
-  [Py.__nullish__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__nullish__]),
-  [Py.__rnullish__]: (left, right) =>
-    left[Py.__logical__](right, binaryDefaultActions[Py.__rnullish__]),
 };
 
 export function $__(
